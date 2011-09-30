@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--
+ * Copyright (c) 2011 Daiki Suganuma. All rights reserved.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+-->
+<html>
+<head>
+  <title>History Plus</title>
+  <link rel="icon" href="icon_16.png" />
+  <link rel="stylesheet" type="text/css" href="css/52framework/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="css/52framework/grid.css"/>
+  <link rel="stylesheet" type="text/css" href="css/goog/common.css"/>
+  <link rel="stylesheet" type="text/css" href="css/goog/custombutton.css"/>
+  <link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+<body>
+  <header class="row">
+    <div class="col col_1 logo">
+      <img src="icon_48.png" width="24" height="24"/>
+    </div>
+    <div class="col col_13">
+      <form id="menu-form" action="#">
+        <div id="menu-date-range">
+          <div id="button-today" class="goog-toggle-button goog-custom-button-collapse-right">
+            Today
+          </div><div id="button-yesterday" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
+            Yesterday
+          </div><div id="button-last-week" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
+            Last Week
+          </div><div id="button-last-month" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
+            Last Month
+          </div><div id="button-date-range-all" class="goog-toggle-button goog-custom-button-collapse-left">
+            All
+          </div>
+        </div>
+        <div id="menu-max-results">
+          <div id="button-100" value="100" class="goog-toggle-button goog-custom-button-collapse-right">
+            100
+          </div><div id="button-250" value="250" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
+            250
+          </div><div id="button-500" value="500" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
+            500
+          </div><div id="button-1000" value="1000" class="goog-toggle-button goog-custom-button-collapse-left">
+            1000
+          </div>
+        </div>
+        <div id="searchbox-frame">
+          <input id="text-search-box" type="text" class="text search-box" label="Keyword"/>
+          <div id="button-search" class="icon goog-custom-button"></div>
+        </div>
+      </form>
+    </div>
+    <div class="col col_2">
+      <div id="button-delete-history" class="goog-custom-button">
+        Delete All
+      </div>
+    </div>
+  </header>
+
+  <section class="row" id="content">
+    <div id="result-display" class="col col_12">
+      Loading...
+    </div>
+    <div class="col col_4">
+    </div>
+  </section>
+
+  <footer class="row">
+    <div class="col col_2 goto-top">
+      <a href="#">Go to Top</a>
+    </div>
+    <div class="col col_14 generator">
+      Generate by <a href="#">History Plus</a>
+    </div>
+    <div class="clear"></div>
+  </footer>
+<script type="text/javascript" src="js/history.min.js"></script>
+</body>
+</html>

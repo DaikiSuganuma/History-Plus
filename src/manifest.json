@@ -1,0 +1,13 @@
+{
+  "name": "History Plus",
+  "version": "1.1.0",
+  "description": "Overrides history page(Ctrl-H). The list is group by domain and easy select date range.",
+  "icons": {
+    "16": "icon_16.png",
+    "48": "icon_48.png",
+    "128": "icon_128.png" },
+  "chrome_url_overrides" : {
+    "history": "history.html"
+    },
+  "permissions": ["history", "chrome://favicon/"]
+}
