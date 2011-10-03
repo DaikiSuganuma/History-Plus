@@ -1,6 +1,6 @@
 {
   "name": "History Plus",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Overrides history page(Ctrl-H). The list is group by domain and easy select date range.",
   "icons": {
     "16": "icon_16.png",

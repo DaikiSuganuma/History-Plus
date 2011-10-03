@@ -72,27 +72,26 @@ historyplus.SearchController = function() {
 };
 
 /**
- * 
+ * Call rendering method and begin search method.
  */
 historyplus.SearchController.prototype.startApp = function() {
   //create header menu and bind javascript events
   this.view_.init();
 
-    //excute search method
+  //excute search method
   this.searchHistory();
-}
+};
 
 /**
  * Search History
- * @return {boolean}
+ * @return {boolean} Whether the search method is working correct.
  */
 historyplus.SearchController.prototype.searchHistory = function() {
   this.view_.clear();
   this.view_.setMessage('Searching ...');
   var query = this.view_.getSeachCondition();
-  this.model_.search(query);
-  return true;
-}
+  return this.model_.search(query);
+};
 
 
 
@@ -101,7 +100,7 @@ historyplus.SearchController.prototype.searchHistory = function() {
  * Container for history data.
  * Wrapper for chrome.history.
  *
- * @param {object} Controller object
+ * @param {object} controller App controller object.
  * @constructor
  */
 historyplus.SearchModel = function(controller) {
@@ -126,8 +125,8 @@ historyplus.SearchModel.prototype.setView = function(view) {
 /**
  * Wrapper for chrome.history.search
  * @see http://code.google.com/chrome/extensions/history.html
- * @param {object} search conditions
- * @return {boolean}
+ * @param {object} query Include search condition parameters.
+ * @return {boolean} Whether search method is called.
  */
 historyplus.SearchModel.prototype.search = function(query) {
   this.data_ = [];
@@ -142,7 +141,7 @@ historyplus.SearchModel.prototype.search = function(query) {
 
   //call chrome api
   //http://code.google.com/chrome/extensions/history.html#method-search
-  chrome.history.search(query, function(results){
+  chrome.history.search(query, function(results) {
     self.view_.setMessage('');
     self.saveHistory(results);
   });
@@ -153,7 +152,7 @@ historyplus.SearchModel.prototype.search = function(query) {
  * Callback function of 'chrome.history.search'.
  * Loop in search results and save history data.
  * @see http://code.google.com/chrome/extensions/history.html#type-HistoryItem
- * @param {array} List of historyItem.
+ * @param {array} itemList List of historyItem.
  */
 historyplus.SearchModel.prototype.saveHistory = function(itemList) {
   this.queryCount = itemList.length;
@@ -168,7 +167,8 @@ historyplus.SearchModel.prototype.saveHistory = function(itemList) {
   for (var i = 0, historyItem; historyItem = itemList[i]; i++) {
     var currentUrl = goog.Uri.parse(historyItem.url);
     //set favicon uri
-    var faviconUri = 'chrome://favicon/' + this.view_.getEncodeURIForCSS(currentUrl.toString());
+    var faviconUri = 'chrome://favicon/';
+    faviconUri += this.view_.getEncodeURIForCSS(currentUrl.toString());
     historyItem.faviconUri = faviconUri;
 
     //check whether the date is real date or not.
@@ -191,9 +191,9 @@ historyplus.SearchModel.prototype.saveHistory = function(itemList) {
       domainItem.domain = currentUrl.getDomain();
       domainItem.url = currentUrl.toString();
       domainItem.faviconUri = faviconUri;
-    } else if (domainItem.title.length == 0
-               || (domainItem.path.length > currentUrl.getPath().length
-                   && historyItem.title.length != 0)) {
+    } else if (domainItem.title.length == 0 ||
+               (domainItem.path.length > currentUrl.getPath().length &&
+                historyItem.title.length != 0)) {
       domainItem.title = historyItem.title;
       domainItem.url = currentUrl.toString();
       domainItem.path = currentUrl.getPath();
@@ -223,7 +223,7 @@ historyplus.SearchModel.prototype.saveHistory = function(itemList) {
  * Callback function of 'chrome.history.getVisits'.
  * Loop in search results and save visit to object.
  * @see http://code.google.com/chrome/extensions/history.html#method-getVisits
- * @param {array} List of VisitItem.
+ * @param {array} itemList List of VisitItem.
  */
 historyplus.SearchModel.prototype.saveVisits = function(itemList) {
   if (!itemList.length) {
@@ -243,7 +243,7 @@ historyplus.SearchModel.prototype.saveVisits = function(itemList) {
  * Datetime formatting pattern is written in source code, see below:
  * closure/goog/i18n/datetimeformat.js
  *
- * @param {object} Controller object
+ * @param {object} controller App controller object.
  * @constructor
  */
 historyplus.SearchView = function(controller) {
@@ -265,10 +265,11 @@ historyplus.SearchView = function(controller) {
 /**
  * Escapes a URI as appropriate for CSS.
  * CSS uris need to have '(' and ')' escaped.
- * @param {string} uri
+ * @param {string} uri CSS uri.
+ * @return {string} The escaped uri.
  */
 historyplus.SearchView.prototype.getEncodeURIForCSS = function(uri) {
-  return uri.replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+  return uri.replace(/\(/g, '\\(').replace(/\)/g, '\\)');
 };
 
 /**
@@ -281,7 +282,8 @@ historyplus.SearchView.prototype.init = function() {
   this.resultDiv_ = goog.dom.getElement('result-display');
 
   //date format
-  this.dateFormatter_ = new goog.i18n.DateTimeFormat("yyyy'/'MM'/'dd '(' E ')'");
+  this.dateFormatter_ =
+    new goog.i18n.DateTimeFormat("yyyy'/'MM'/'dd '(' E ')'");
   this.timeFormatter_ = new goog.i18n.DateTimeFormat("H':'mm");
 
   // Search form
@@ -295,47 +297,49 @@ historyplus.SearchView.prototype.init = function() {
   li.decorate(goog.dom.getElement('text-search-box'));
   var button = goog.ui.decorate(goog.dom.getElement('button-search'));
   goog.events.listen(button, goog.ui.Component.EventType.ACTION,
-    function(e){
+    function(e) {
       self.controller_.searchHistory();
     });
 
   // Create header menu button.
   // Date Rage Menu
-  goog.array.forEach(goog.dom.query('#menu-date-range .goog-toggle-button'), function(element, index, list){
-    var button = goog.ui.decorate(goog.dom.getElement(element));
-    self.menuDateRage_.push(button); //save in member variable
-    if (index == list.length - 1) {
-      button.setChecked(true);
-    }
-    //bind event
-    button.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
-    goog.events.listen(button, goog.ui.Component.EventType.ACTION,
-      function(e){
-        self.eventMenuDateRageButtonClick(e);
-      });
-  });
+  goog.array.forEach(goog.dom.query('#menu-date-range .goog-toggle-button'),
+    function(element, index, list) {
+      var button = goog.ui.decorate(goog.dom.getElement(element));
+      self.menuDateRage_.push(button); //save in member variable
+      if (index == list.length - 1) {
+        button.setChecked(true);
+      }
+      //bind event
+      button.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
+      goog.events.listen(button, goog.ui.Component.EventType.ACTION,
+        function(e) {
+          self.handleMenuDateRageClick(e);
+        });
+    });
 
   // Max Results Menu
-  goog.array.forEach(goog.dom.query('#menu-max-results .goog-toggle-button'), function(element, index, list){
-    var button = goog.ui.decorate(goog.dom.getElement(element));
-    self.menuMaxResults_.push(button); //save in member variable
-    if (index == 0) {
-      button.setChecked(true);
-    }
-    //bind event
-    button.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
-    goog.events.listen(button, goog.ui.Component.EventType.ACTION,
-      function(e){
-        self.eventMenuMaxResultsButtonClick(e);
-      });
-  });
+  goog.array.forEach(goog.dom.query('#menu-max-results .goog-toggle-button'),
+    function(element, index, list) {
+      var button = goog.ui.decorate(goog.dom.getElement(element));
+      self.menuMaxResults_.push(button); //save in member variable
+      if (index == 0) {
+        button.setChecked(true);
+      }
+      //bind event
+      button.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
+      goog.events.listen(button, goog.ui.Component.EventType.ACTION,
+        function(e) {
+          self.handleMenuMaxResultsClick(e);
+        });
+    });
 
   // Delete Button
   var button = goog.ui.decorate(goog.dom.getElement('button-delete-history'));
   goog.events.listen(button, goog.ui.Component.EventType.ACTION,
-    function(e){
+    function(e) {
       if (confirm('Are you sure that all history is deleted?')) {
-        chrome.history.deleteAll(function(){
+        chrome.history.deleteAll(function() {
           self.setMessage('All history is deleted.');
         });
       }
@@ -353,18 +357,18 @@ historyplus.SearchView.prototype.clear = function() {
 
 /**
  * Clear HTML Contents and set text message
- * @param {string} str insert text
+ * @param {string} str The text is inserted to result div.
  */
 historyplus.SearchView.prototype.setMessage = function(str) {
   str = str || '';
   this.resultDiv_.innerHTML = str;
-}
+};
 
 /**
  * Append new domain item. it has HistoryItem array list.
- * @param {object} domainItem a object that has HistoryItem of same domain.
- * @param {integer} dataNo line number.
- * @return {boolean}
+ * @param {object} domainItem A object that has HistoryItem of same domain.
+ * @param {integer} dataNo The number of incremented by domain.
+ * @return {boolean} Whether the rendering succress.
  */
 historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
   if (!domainItem.list) return false;
@@ -386,7 +390,8 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
     }
     if (isDateLine) {
       var currentDate = this.dateFormatter_.format(this.rowDate_);
-      this.resultDiv_.appendChild(goog.dom.createDom('div', 'date clear', currentDate));
+      this.resultDiv_.appendChild(
+        goog.dom.createDom('div', 'date clear', currentDate));
     }
   }
 
@@ -409,31 +414,33 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
   //title & favicon
   itemDiv.appendChild(
     goog.dom.createDom('a',
-                       { 'class': 'title',
-                         'href': domainItem.url,
-                         'target': '_blank',
-                         'title': domainItem.title,
-                         'style': 'background: url(' + domainItem.faviconUri + ') no-repeat;'
-                         }, domainItem.title || domainItem.url));
+      { 'class': 'title',
+        'href': domainItem.url,
+        'target': '_blank',
+        'title': domainItem.title,
+        'style': 'background: url(' + domainItem.faviconUri + ') no-repeat;'
+        }, domainItem.title || domainItem.url));
   //visit count and child node
   if (domainItem.list.length == 1) {
     var item = domainItem.list[0];
     if (item.visitCount > 1) {
       //visit count
       itemDiv.appendChild(
-        goog.dom.createDom('span', 'visit-count',
-                           goog.dom.createTextNode('( '),
-                           goog.dom.createDom('a', {'href': '#'}, item.visitCount + ' times'),
-                           goog.dom.createTextNode(' )')));
+        goog.dom.createDom('span',
+          'visit-count',
+          goog.dom.createTextNode('( '),
+          goog.dom.createDom('a', {'href': '#'}, item.visitCount + ' times'),
+          goog.dom.createTextNode(' )')));
     }
   } else {
     //if it have some child node
     //append node page count
     itemDiv.appendChild(
-      goog.dom.createDom('span', 'page-count',
-                         goog.dom.createTextNode('( '),
-                         goog.dom.createTextNode(domainItem.list.length + ' pages'),
-                         goog.dom.createTextNode(' )')));
+      goog.dom.createDom('span',
+        'page-count',
+        goog.dom.createTextNode('( '),
+        goog.dom.createTextNode(domainItem.list.length + ' pages'),
+        goog.dom.createTextNode(' )')));
 
     var frameChildItem = goog.dom.createDom('div', 'child-frame');
     goog.style.showElement(frameChildItem, false);
@@ -457,26 +464,27 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
       //time
       var timeString = '-';
       if (!child.lastVisitTimeUpdated) {
-        var timeObject = goog.date.DateTime.fromRfc822String(child.lastVisitTime);
+        var timeObject =
+          goog.date.DateTime.fromRfc822String(child.lastVisitTime);
         timeString = this.timeFormatter_.format(timeObject);
       }
       childDiv.appendChild(goog.dom.createDom('span', 'time', timeString));
 
-      //title 
+      //title
       childDiv.appendChild(
         goog.dom.createDom('a',
-                           { 'class': 'title',
-                             'href': child.url,
-                             'title': child.title,
-                             'target': '_blank'
-                             }, child.title || child.url));
+          { 'class': 'title',
+            'href': child.url,
+            'title': child.title,
+            'target': '_blank'
+            }, child.title || child.url));
 
       //visit count
       childDiv.appendChild(
         goog.dom.createDom('span', 'visit-count',
-                           goog.dom.createTextNode('( '),
-                           goog.dom.createDom('a', {'href': '#'}, child.visitCount + ' times'),
-                           goog.dom.createTextNode(' )')));
+          goog.dom.createTextNode('( '),
+          goog.dom.createDom('a', {'href': '#'}, child.visitCount + ' times'),
+          goog.dom.createTextNode(' )')));
 
       frameChildItem.appendChild(childDiv);
     }
@@ -486,21 +494,22 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
   }
 
   frameDiv.appendChild(itemDiv);
-  
+
   this.resultDiv_.appendChild(frameDiv);
   return true;
 };
 
 /**
  * Get start date from list
- * @param {object} domainItem a object that has HistoryItem of same domain.
- * @return {goog.date.DateTime}
+ * @param {object} domainItem A object that has HistoryItem of same domain.
+ * @return {goog.date.DateTime} The first date of the domain.
  */
 historyplus.SearchView.prototype.getStartDate = function(domainItem) {
   if (!domainItem) return false;
   if (!domainItem.list) return false;
+  var list = domainItem.list;
   var date = null;
-  for (var i = domainItem.list.length - 1, item; item = domainItem.list[i]; i--) {
+  for (var i = list.length - 1, item; item = list[i]; i--) {
     if (item.lastVisitTimeUpdated) continue;
     date = new goog.date.DateTime();
     date.setTime(item.lastVisitTime);
@@ -511,14 +520,15 @@ historyplus.SearchView.prototype.getStartDate = function(domainItem) {
 
 /**
  * Get end date from list
- * @param {object} domainItem a object that has HistoryItem of same domain.
- * @return {goog.date.DateTime}
+ * @param {object} domainItem A object that has HistoryItem of same domain.
+ * @return {goog.date.DateTime} The End date of the domain.
  */
 historyplus.SearchView.prototype.getEndDate = function(domainItem) {
   if (!domainItem) return false;
   if (!domainItem.list) return false;
+  var list = domainItem.list;
   var date = null;
-  for (var i = 0, item; item = domainItem.list[i]; i++) {
+  for (var i = 0, item; item = list[i]; i++) {
     if (item.lastVisitTimeUpdated) continue;
     date = new goog.date.DateTime();
     date.setTime(item.lastVisitTime);
@@ -528,15 +538,16 @@ historyplus.SearchView.prototype.getEndDate = function(domainItem) {
 };
 
 /**
- * collect search condition from header menu.
- * @return {object} search condition
+ * Collect search condition from header menu.
+ * @return {object} The object include search condition.
  */
 historyplus.SearchView.prototype.getSeachCondition = function() {
   var cond = {};
   //search string
   cond.text = goog.dom.getElement('text-search-box').value;
   //date range
-  var button = goog.dom.query('#menu-date-range .goog-custom-button-checked')[0];
+  var button = goog.dom.query('#menu-date-range .goog-custom-button-checked');
+  if (button) button = button[0];
   var range = null;
   if (button.id == 'button-today') { //today
     range = goog.date.DateRange.today();
@@ -563,44 +574,45 @@ historyplus.SearchView.prototype.getSeachCondition = function() {
     }
   }
   //max results
-  var button = goog.dom.query('#menu-max-results .goog-custom-button-checked')[0];
+  var button = goog.dom.query('#menu-max-results .goog-custom-button-checked');
+  if (button) button = button[0];
   var count = parseInt(button.getAttribute('value'));
   if (goog.isNumber(count)) {
     cond.maxResults = count;
   }
-  return  cond;
+  return cond;
 };
 
 /**
  * Action Event when Date Rage Menu click
- * @param {object} event object
- * @return {boolean}
+ * @param {object} e Event object.
+ * @return {boolean} Whether the click event end correctly.
  */
-historyplus.SearchView.prototype.eventMenuDateRageButtonClick = function(event) {
+historyplus.SearchView.prototype.handleMenuDateRageClick = function(e) {
   //all button check false
-  goog.array.forEach(this.menuDateRage_, function(button){
+  goog.array.forEach(this.menuDateRage_, function(button) {
     button.setChecked(false);
   });
-  event.target.setChecked(true);
+  e.target.setChecked(true);
 
   //excute search
-  this.controller_.searchHistory()
+  this.controller_.searchHistory();
   return true;
 };
 
 /**
  * Action Event when Max Results Menu click
- * @param {object} event object
- * @return {boolean}
+ * @param {object} e Event object.
+ * @return {boolean} Whether the click event end correctly.
  */
-historyplus.SearchView.prototype.eventMenuMaxResultsButtonClick = function(event) {
-  goog.array.forEach(this.menuMaxResults_, function(button){
+historyplus.SearchView.prototype.handleMenuMaxResultsClick = function(e) {
+  goog.array.forEach(this.menuMaxResults_, function(button) {
     button.setChecked(false);
   });
   event.target.setChecked(true);
 
   //excute search
-  this.controller_.searchHistory()
+  this.controller_.searchHistory();
   return true;
 };
 
