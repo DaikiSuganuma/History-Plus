@@ -1,0 +1,39 @@
+History Plus overrides default history page.
+
+
+-----------------------
+Features
+-----------------------
+ - Select date range easier: Today, Yesterday, Last Week, Last Month, All
+ - Select max result number easier: 100, 250, 500, 1000
+ - Delete all history
+ - Grouping same domain in the list
+ - Show visit counts each url in the list
+
+
+-----------------------
+Todo
+-----------------------
+ - i18n
+ - Limit string
+ - Select date range by using calendar
+ - History detail when visit count is clicked
+ - Adjust line space by comparing pre-time
+ - Show calendar, and color highlight that focus on the current date in calendar is following as you scroll.
+ - New useful design like Gmail + iPad
+
+
+-----------------------
+Author
+-----------------------
+http://se-suganuma.blogspot.com/
+
+* this source code is public in GitHub.
+https://github.com/DaikiSuganuma/History-Plus
+
+-----------------------
+Change Log
+-----------------------
+v1.1.0
+ - First release
+

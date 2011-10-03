@@ -1,0 +1,4 @@
+Closure Library Check out here.
+svn checkout http://closure-library.googlecode.com/svn/trunk ./
+
+Official Site: http://code.google.com/closure/library/
