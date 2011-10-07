@@ -15,6 +15,7 @@
 
 
 
+
 /*
  * 01. Reset
  */
@@ -28,6 +29,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 input, select {vertical-align:middle;}
+
 
 
 
@@ -66,14 +68,22 @@ input, select {vertical-align:middle;}
   border: 0;
   padding: 4px 32px 4px 4px;
 }
+/* Calendar */
+.goog-date-picker {
+  background: #fff;
+  border: none;
+}
+  .goog-date-picker td {
+  }
 
 
 
 /*
  * 03. Common CSS
  */
-input.hp-text {border:1px solid #bbb;}
-input.hp-text:focus {border-color:#666;}
+.clear {clear: both;}
+.hp-text {border: 1px solid #bbb;}
+.hp-text:focus {border-color: #666;}
 .hp-icon {
   background-image: url(../images/icons.png);
   width: 16px;
@@ -89,6 +99,7 @@ input.hp-text:focus {border-color:#666;}
   padding: 0 2px;
   vertical-align: bottom;
 }
+
 
 
 
@@ -108,6 +119,9 @@ header {
   #date-range {}
     #date-range .goog-toolbar-menu-button-caption {
       width: 80px;
+    }
+    .date-range-separator {
+      color: #aaa;
     }
   /* Max Results */
   #max-results {}
@@ -130,9 +144,47 @@ header {
 
 
 
+
 /*
  * 04. Sidebar
  */
+#sidebar {
+  float: left;
+  background: #fff;
+  width: 180px;
+  margin: 0;
+  padding: 0;
+}
+  /* Sidebar Calendar */
+  #sidebar .sidebar-calendar-frame {
+    margin: 10px auto;
+  }
+  #sidebar-calendar {}
+    #sidebar-calendar .goog-date-picker {
+      float: none;
+    }
+    #sidebar-calendar .goog-date-picker table {
+      width: 100%;
+    }
+
+  /* Search Keyword */
+  #sidebar .search-keywords-frame {
+    margin: 10px 0 0 0;
+  }
+  #search-keyword-cloud,
+  #search-keywords {
+    margin: 10px 0;
+    padding-left: 10px;
+    border-top: 2px solid #999;
+  }
+    #search-keyword-cloud h3,
+    #search-keywords h3 {
+      margin: 5px 0;
+      font-size: 12px;
+    }
+  /* Search Keyword Cloud */
+  #search-keyword-cloud {
+  }
 
 
 
@@ -140,6 +192,7 @@ header {
  * 05. Contents
  */
 #content {
+  float: right;
   background: #fff;
   padding: 5px 0 20px;
 }

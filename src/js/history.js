@@ -35,6 +35,9 @@ goog.require('goog.date');
 goog.require('goog.date.DateRange');
 goog.require('goog.date.DateTime');
 goog.require('goog.date.Interval');
+goog.require('goog.i18n.DateTimeSymbols');
+goog.require('goog.i18n.DateTimeSymbols_en_ISO');
+goog.require('goog.ui.DatePicker');
 goog.require('goog.dom');
 goog.require('goog.dom.classes');
 goog.require('goog.dom.query');
@@ -298,13 +301,10 @@ historyplus.SearchView.prototype.init = function() {
     new goog.i18n.DateTimeFormat("yyyy'/'MM'/'dd '(' E ')'");
   this.timeFormatter_ = new goog.i18n.DateTimeFormat("H':'mm");
 
-  // Search form
-  /*
-  var form = goog.dom.getElement('menu-form');
-  form.onsubmit = function() {
-    self.controller_.searchHistory();
-    return false;
-  };*/
+  //Create header menu toolbar.
+  var toolbar = new goog.ui.Toolbar();
+  toolbar.decorate(goog.dom.getElement('header-toolbar'));
+
   // Search Text input
   var li = new goog.ui.LabelInput;
   li.decorate(goog.dom.getElement('text-search-box'));
@@ -314,55 +314,15 @@ historyplus.SearchView.prototype.init = function() {
       self.controller_.searchHistory();
     });
 
-  //Create header menu toolbar.
-  var toolbar = new goog.ui.Toolbar();
-  toolbar.decorate(goog.dom.getElement('header-toolbar'));
-
-  // Create header menu button.
-  // Date Rage Menu
-  /*
-  goog.array.forEach(goog.dom.query('#menu-date-range .goog-toggle-button'),
-    function(element, index, list) {
-      var button = goog.ui.decorate(goog.dom.getElement(element));
-      self.menuDateRage_.push(button); //save in member variable
-      if (index == list.length - 1) {
-        button.setChecked(true);
-      }
-      //bind event
-      button.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
-      goog.events.listen(button, goog.ui.Component.EventType.ACTION,
-        function(e) {
-          self.handleMenuDateRageClick(e);
-        });
-    });*/
-
-  // Max Results Menu
-  goog.array.forEach(goog.dom.query('#menu-max-results .goog-toggle-button'),
-    function(element, index, list) {
-      var button = goog.ui.decorate(goog.dom.getElement(element));
-      self.menuMaxResults_.push(button); //save in member variable
-      if (index == 0) {
-        button.setChecked(true);
-      }
-      //bind event
-      button.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
-      goog.events.listen(button, goog.ui.Component.EventType.ACTION,
-        function(e) {
-          self.handleMenuMaxResultsClick(e);
-        });
-    });
-
-  // Delete Button
-  var button = goog.ui.decorate(goog.dom.getElement('button-delete-history'));
-  goog.events.listen(button, goog.ui.Component.EventType.ACTION,
-    function(e) {
-      if (confirm('Are you sure that all history is deleted?')) {
-        chrome.history.deleteAll(function() {
-          self.setMessage('All history is deleted.');
-        });
-      }
-    });
-
+  // Sidebar init
+  // Calendar
+  var calendar = new goog.ui.DatePicker();
+  calendar.setShowWeekNum(false);
+  calendar.setShowToday(false);
+  calendar.setUseNarrowWeekdayNames(true);
+  calendar.setAllowNone(false);
+  calendar.setUseSimpleNavigationMenu(true);
+  calendar.render(goog.dom.getElement('sidebar-calendar'));
 };
 
 /**
