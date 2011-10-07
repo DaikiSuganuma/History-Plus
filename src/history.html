@@ -8,56 +8,88 @@
 <head>
   <title>History Plus</title>
   <link rel="icon" href="icon_16.png" />
-  <link rel="stylesheet" type="text/css" href="css/52framework/reset.css"/>
-  <link rel="stylesheet" type="text/css" href="css/52framework/grid.css"/>
   <link rel="stylesheet" type="text/css" href="css/goog/common.css"/>
   <link rel="stylesheet" type="text/css" href="css/goog/custombutton.css"/>
-  <link rel="stylesheet" type="text/css" href="css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="css/goog/menu.css"/>
+  <link rel="stylesheet" type="text/css" href="css/goog/menuitem.css"/>
+  <link rel="stylesheet" type="text/css" href="css/goog/menuseparator.css"/>
+  <link rel="stylesheet" type="text/css" href="css/goog/toolbar.css"/>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
   <script type="text/javascript" src="closure-library/closure/goog/base.js"></script>
   <script type="text/javascript" src="js/deps.js"></script>
 </head>
 <body>
-  <header class="row">
-    <div class="col col_1 logo">
-      <img src="icon_48.png" width="24" height="24"/>
-    </div>
-    <div class="col col_13">
-      <form id="menu-form" action="#">
-        <div id="menu-date-range">
-          <div id="button-today" class="goog-toggle-button goog-custom-button-collapse-right">
-            Today
-          </div><div id="button-yesterday" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
-            Yesterday
-          </div><div id="button-last-week" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
-            Last Week
-          </div><div id="button-last-month" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
-            Last Month
-          </div><div id="button-date-range-all" class="goog-toggle-button goog-custom-button-collapse-left">
-            All
-          </div>
+  <header>
+
+    <div id="header-toolbar" class="goog-toolbar">
+
+      <div class="hp-icon hp-icon-calendar goog-inline-block"></div>
+      <div id="date-range" title="Date Range" class="goog-toolbar-select">
+        <div id="menu-date-range" class="goog-menu">
+          <div class="goog-option" value="today">Today</div>
+          <div class="goog-option" value="yesterday">Yesterday</div>
+          <div class="goog-option" value="last-week">Last Week</div>
+          <div class="goog-option" value="last-month">Last Month</div>
+          <div class="goog-menuseparator"></div>
+          <div class="goog-option" value="all">All</div>
         </div>
-        <div id="menu-max-results">
-          <div id="button-100" value="100" class="goog-toggle-button goog-custom-button-collapse-right">
-            100
-          </div><div id="button-250" value="250" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
-            250
-          </div><div id="button-500" value="500" class="goog-toggle-button goog-custom-button-collapse-right goog-custom-button-collapse-left">
-            500
-          </div><div id="button-1000" value="1000" class="goog-toggle-button goog-custom-button-collapse-left">
-            1000
-          </div>
-        </div>
-        <div id="searchbox-frame">
-          <input id="text-search-box" type="text" class="text search-box" label="Keyword"/>
-          <div id="button-search" class="icon goog-custom-button"></div>
-        </div>
-      </form>
-    </div>
-    <div class="col col_2">
-      <div id="button-delete-history" class="goog-custom-button">
-        Delete All
       </div>
+
+      <!--
+      <hr/>
+
+      <div id="date-range-begin" class="goog-toolbar-select">
+        <div id="menu-date-range-calendar-begin" class="goog-menu">
+          <div class="goog-option" value="">2011/10/07</div>
+        </div>
+      </div>
+      <div class="goog-toolbar-button goog-toolbar-button-disabled">&ndash;</div>
+      <div id="date-range-end" class="goog-toolbar-select">
+        <div id="menu-date-range-calendar-end" class="goog-menu">
+          <div class="goog-option" value="">2011/10/07</div>
+        </div>
+      </div>
+        -->
+
+      <hr/>
+
+      <div class="hp-icon hp-icon-limit goog-inline-block"></div>
+      <div value="100" class="goog-toolbar-toggle-button goog-toolbar-button-collapse-right">
+        100
+      </div>
+      <div value="250" class="goog-toolbar-toggle-button goog-toolbar-button-collapse-left goog-toolbar-button-collapse-right">
+        250
+      </div>
+      <div value="500" class="goog-toolbar-toggle-button goog-toolbar-button-collapse-left goog-toolbar-button-collapse-right">
+        500
+      </div>
+      <div value="1000" class="goog-toolbar-toggle-button goog-toolbar-button-collapse-left">
+        1000
+      </div>
+
+      <hr/>
+
+      <div class="goog-inline-block">
+        <input id="text-search-box" type="text" class="hp-text search-box" label="Keyword"/>
+        <div id="button-search" class="goog-custom-button"></div>
+      </div>
+
+      <hr/>
+
+      <div id="delete-history" title="Delete History" class="goog-toolbar-menu-button">
+        <div>
+          <span class="hp-icon hp-icon-delete goog-inline-block">&nbsp;</span>
+          <span class="hp-insert-caption goog-inline-block">Delete History</span>
+        </div>
+        <div id="menu-delete-history" class="goog-menu">
+          <div class="goog-option" value="all">Current Date Range</div>
+          <div class="goog-menuseparator"></div>
+          <div class="goog-option" value="all">All</div>
+        </div>
+      </div>
+
     </div>
+
   </header>
 
   <section class="row" id="content">
@@ -68,15 +100,6 @@
     </div>
   </section>
 
-  <footer class="row">
-    <div class="col col_2 goto-top">
-      <a href="#">Go to Top</a>
-    </div>
-    <div class="col col_14 generator">
-      Generate by <a href="#">History Plus</a>
-    </div>
-    <div class="clear"></div>
-  </footer>
 <!--<script type="text/javascript" src="js/history.min.js"></script>-->
 <script type="text/javascript">
 goog.require('historyplus.SearchController');

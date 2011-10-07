@@ -6,83 +6,138 @@
 
 /*
  * 01. Common Styles
- * 02. Header
- * 03. Contents
- * 99. Footer
+ * 02. Overwrite Closure Library CSS
+ * 03. Common CSS
+ * 04. Header
+ * 05. Sidebar
+ * 06. Contents
  */
+
 
 
 /*
- * 01. Common Styles
+ * 01. Reset
  */
 body {
   background: #eee;
+  margin: 0;
+  padding: 0;
   font-size: 12px;
   line-height: 1.5;
   color: #333;
   font-family: Arial, Helvetica, sans-serif;
 }
-.clear {clear: both;}
-.text {border:1px solid #bbb;}
-.text:focus {border-color:#666;}
-a {}
-a:hover {}
-.hide {display: none;}
+input, select {vertical-align:middle;}
+
+
 
 /*
- * 02. Closure Library CSS
+ * 02. Overwrite Closure Library CSS
  */
+/* Button */
 .goog-toggle-button,
 .goog-custom-button  {
   display: inline-block;
   background-image: url(../images/bg_button.png);
 }
+.goog-custom-button-inner-box {
+  cursor: pointer;
+}
+/* Toolbar */
+.goog-toolbar {
+  background-image: url(../images/bg_toolbar.png);
+}
+.goog-toolbar-select {
+    margin: 0 10px;
+}
+.goog-toolbar .goog-toolbar-separator {
+    margin: 0 20px;
+}
+.goog-toolbar-select {}
+  .goog-toolbar-select .goog-toolbar-menu-button-caption {
+    width: auto;
+    overflow: hidden;
+    padding-left: 5px;
+  }
+.goog-toolbar-menu-button-dropdown {
+  background-image: url(../images/icons_toolbar.png);
+}
+.goog-menuitem {
+  border: 0;
+  padding: 4px 32px 4px 4px;
+}
+
+
 
 /*
- * 02. Header
+ * 03. Common CSS
+ */
+input.hp-text {border:1px solid #bbb;}
+input.hp-text:focus {border-color:#666;}
+.hp-icon {
+  background-image: url(../images/icons.png);
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.hp-icon-calendar {background-position: -2px 0px;}
+.hp-icon-limit {background-position: -22px -1px;}
+.hp-icon-delete {background-position: -61px -1px;}
+
+.hp-insert-caption {
+  padding: 0 2px;
+  vertical-align: bottom;
+}
+
+
+
+/*
+ * 04. Header
  */
 header {
   background: #DDDDDD;
   border-bottom: 1px solid #D5D5D5;
-  
+  height: 30px;
 }
-  header .col {
-    padding: 5px 0;
+  #header-toolbar {
+    padding: 0 20px;
   }
-  header .logo {
-    text-align: center;
-    padding: 8px 0 0;
-  }
+
+  /* Date Range */
+  #date-range {}
+    #date-range .goog-toolbar-menu-button-caption {
+      width: 80px;
+    }
+  /* Max Results */
+  #max-results {}
+    #max-results .goog-toolbar-menu-button-caption {
+      width: 60px;
+    }
 
   /* Search Box */
   header .search-box {
     width: 100px;
-    padding: 4px 5px;
-    border-radius: 5px;
+    padding: 3px 5px;
+    border-radius: 3px;
   }
   header #button-search .goog-custom-button-inner-box {
-    height: 16px;
+    background: url(../images/icons.png) -38px -0px no-repeat;
     width: 16px;
-    background: url(../images/bg_search_box.png) 50% 50% no-repeat;
-    vertical-align: middle;
+    height: 16px;
+    background-repeat: no-repeat;
   }
-#menu-date-range,
-#menu-max-results,
-#searchbox-frame {
-  display: inline-block;
-  margin-right: 10px;
-}
-header .goog-custom-button-inner-box {
-  cursor: pointer;
-  padding: 3px 8px;
-}
-#button-delete-history {
-  color: #dd0000;
-}
+
 
 
 /*
- * 03. Contents
+ * 04. Sidebar
+ */
+
+
+
+/*
+ * 05. Contents
  */
 #content {
   background: #fff;
@@ -130,21 +185,4 @@ header .goog-custom-button-inner-box {
       padding-left: 10px;
     }
 
-
-/*
- * 99. Footer
- */
-footer.row {
-  background-color: #DDDDDD;
-  border-top: 1px solid #999999;
-  padding: 5px 0 20px;
-}
-  footer .goto-top {}
-    footer .goto-top a {
-      background: url(../images/bg_goto_top.png) no-repeat 2% 50%;
-      padding-left: 12px;
-    }
-  footer .generator {
-    text-align: right;
-  }
 

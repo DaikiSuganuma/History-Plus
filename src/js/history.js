@@ -44,7 +44,19 @@ goog.require('goog.i18n.DateTimeParse');
 goog.require('goog.style');
 goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.LabelInput');
+goog.require('goog.ui.Menu');
+goog.require('goog.ui.MenuItem');
+goog.require('goog.ui.Option');
+goog.require('goog.ui.SelectionModel');
+goog.require('goog.ui.Separator');
 goog.require('goog.ui.ToggleButton');
+goog.require('goog.ui.Toolbar');
+goog.require('goog.ui.ToolbarRenderer');
+goog.require('goog.ui.ToolbarButton');
+goog.require('goog.ui.ToolbarMenuButton');
+goog.require('goog.ui.ToolbarSelect');
+goog.require('goog.ui.ToolbarSeparator');
+goog.require('goog.ui.ToolbarToggleButton');
 goog.require('goog.ui.decorate');
 
 /**
@@ -287,11 +299,12 @@ historyplus.SearchView.prototype.init = function() {
   this.timeFormatter_ = new goog.i18n.DateTimeFormat("H':'mm");
 
   // Search form
+  /*
   var form = goog.dom.getElement('menu-form');
   form.onsubmit = function() {
     self.controller_.searchHistory();
     return false;
-  };
+  };*/
   // Search Text input
   var li = new goog.ui.LabelInput;
   li.decorate(goog.dom.getElement('text-search-box'));
@@ -301,8 +314,13 @@ historyplus.SearchView.prototype.init = function() {
       self.controller_.searchHistory();
     });
 
+  //Create header menu toolbar.
+  var toolbar = new goog.ui.Toolbar();
+  toolbar.decorate(goog.dom.getElement('header-toolbar'));
+
   // Create header menu button.
   // Date Rage Menu
+  /*
   goog.array.forEach(goog.dom.query('#menu-date-range .goog-toggle-button'),
     function(element, index, list) {
       var button = goog.ui.decorate(goog.dom.getElement(element));
@@ -316,7 +334,7 @@ historyplus.SearchView.prototype.init = function() {
         function(e) {
           self.handleMenuDateRageClick(e);
         });
-    });
+    });*/
 
   // Max Results Menu
   goog.array.forEach(goog.dom.query('#menu-max-results .goog-toggle-button'),
@@ -391,7 +409,7 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
     if (isDateLine) {
       var currentDate = this.dateFormatter_.format(this.rowDate_);
       this.resultDiv_.appendChild(
-        goog.dom.createDom('div', 'date clear', currentDate));
+        goog.dom.createDom('div', 'date', currentDate));
     }
   }
 
