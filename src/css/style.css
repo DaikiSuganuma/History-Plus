@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2011 Daiki Suganuma. All rights reserved.
- * Use of this source code is governed by a BSD-style license that can be
+ * Copyright (c) 2011 History Plus Authors. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be
  * found in the LICENSE file.
  */
 
@@ -107,9 +107,11 @@ input, select {vertical-align:middle;}
  * 04. Header
  */
 header {
+  position: relative;
   background: #DDDDDD;
   border-bottom: 1px solid #D5D5D5;
   height: 30px;
+  min-width: 980px;
 }
   #header-toolbar {
     padding: 0 20px;
@@ -142,7 +144,12 @@ header {
     background-repeat: no-repeat;
   }
 
-
+  /* Delete History */
+  header #delete-history {
+    position: absolute;
+    top: 0;
+    right: 20px;
+  }
 
 
 /*
