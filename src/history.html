@@ -20,7 +20,7 @@
   <script type="text/javascript" src="js/deps.js"></script>
 </head>
 <body>
-  <header>
+  <header id="header">
 
     <div id="header-toolbar" class="goog-toolbar">
 
@@ -67,7 +67,7 @@
       <hr/>
 
       <div class="goog-inline-block">
-        <input id="text-search-box" type="text" class="hp-text search-box" label="Keyword"/>
+        <input id="text-search-box" type="text" class="hp-text search-box" label="Filter by keyword"/>
         <div id="button-search" class="goog-custom-button"></div>
       </div>
 
@@ -89,7 +89,7 @@
 
   </header>
 
-  <div>
+  <div class="content-frame">
     <div id="sidebar">
       <div class="sidebar-calendar-frame">
         <div id="sidebar-calendar"></div>
@@ -108,7 +108,10 @@
     </div><!-- /#sidebar -->
 
     <div id="content">
-      <div id="result-display" class="col">
+      <div id="list-header">
+        list header
+      </div>
+      <div id="list-result">
         Loading...
       </div>
     </div><!-- /#content -->

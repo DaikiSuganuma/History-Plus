@@ -35,17 +35,20 @@ goog.require('goog.date');
 goog.require('goog.date.DateRange');
 goog.require('goog.date.DateTime');
 goog.require('goog.date.Interval');
-goog.require('goog.i18n.DateTimeSymbols');
-goog.require('goog.i18n.DateTimeSymbols_en_ISO');
-goog.require('goog.ui.DatePicker');
 goog.require('goog.dom');
 goog.require('goog.dom.classes');
 goog.require('goog.dom.query');
+goog.require('goog.dom.ViewportSizeMonitor');
 goog.require('goog.events');
+goog.require('goog.events.EventType');
 goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.i18n.DateTimeParse');
+goog.require('goog.i18n.DateTimeSymbols');
+goog.require('goog.i18n.DateTimeSymbols_en_ISO');
+goog.require('goog.math.Size');
 goog.require('goog.style');
 goog.require('goog.ui.CustomButton');
+goog.require('goog.ui.DatePicker');
 goog.require('goog.ui.LabelInput');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
@@ -61,6 +64,7 @@ goog.require('goog.ui.ToolbarSelect');
 goog.require('goog.ui.ToolbarSeparator');
 goog.require('goog.ui.ToolbarToggleButton');
 goog.require('goog.ui.decorate');
+
 
 /**
  * Base namespace for History Plus.
@@ -94,7 +98,7 @@ historyplus.SearchController.prototype.startApp = function() {
   this.view_.init();
 
   //excute search method
-  this.searchHistory();
+  //this.searchHistory();
 };
 
 /**
@@ -264,12 +268,18 @@ historyplus.SearchModel.prototype.saveVisits = function(itemList) {
 historyplus.SearchView = function(controller) {
   this.controller_ = controller;
 
+  // frames
+  this.domHeader_ = null;
+  this.domContent_ = null;
+  this.domSidebar_ = null;
+
   //Header Area
   this.menuDateRage_ = [];
   this.menuMaxResults_ = [];
 
   //Search Result Area
-  this.resultDiv_ = null;
+  this.domListHeader_ = null;
+  this.domList_ = null;
   this.dateFormatter_ = null;
   this.timeFormatter_ = null;
 
@@ -293,10 +303,16 @@ historyplus.SearchView.prototype.getEncodeURIForCSS = function(uri) {
 historyplus.SearchView.prototype.init = function() {
   var self = this;
 
-  //Search Result Area
-  this.resultDiv_ = goog.dom.getElement('result-display');
+  // set the frames
+  this.domHeader_ = goog.dom.getElement('header');
+  this.domContent_ = goog.dom.getElement('content');
+  this.domSidebar_ = goog.dom.getElement('sidebar');
 
-  //date format
+  // Search Result Area
+  this.domListHeader_ = goog.dom.getElement('list-header');
+  this.domList_ = goog.dom.getElement('list-result');
+
+  // date format
   this.dateFormatter_ =
     new goog.i18n.DateTimeFormat("yyyy'/'MM'/'dd '(' E ')'");
   this.timeFormatter_ = new goog.i18n.DateTimeFormat("H':'mm");
@@ -304,6 +320,14 @@ historyplus.SearchView.prototype.init = function() {
   //Create header menu toolbar.
   var toolbar = new goog.ui.Toolbar();
   toolbar.decorate(goog.dom.getElement('header-toolbar'));
+
+  // Initiallize the content size
+  this.setContentSize(goog.dom.getViewportSize());
+  // Bind window resize
+  var vsm = new goog.dom.ViewportSizeMonitor();
+  goog.events.listen(vsm, goog.events.EventType.RESIZE, function(e) {
+    self.setContentSize(vsm.getSize());
+  });
 
   // Search Text input
   var li = new goog.ui.LabelInput;
@@ -330,17 +354,49 @@ historyplus.SearchView.prototype.init = function() {
  */
 historyplus.SearchView.prototype.clear = function() {
   this.rowDate_ = null;
-  this.resultDiv_.innerHTML = '';
+  this.domList_.innerHTML = '';
 };
 
 /**
  * Clear HTML Contents and set text message
- * @param {string} str The text is inserted to result div.
+ * @param {?string} opt_str The text is inserted to result div.
  */
-historyplus.SearchView.prototype.setMessage = function(str) {
-  str = str || '';
-  this.resultDiv_.innerHTML = str;
+historyplus.SearchView.prototype.setMessage = function(opt_str) {
+  opt_str = opt_str || '';
+  this.domList_.innerHTML = opt_str;
 };
+
+/**
+ * Set width and height of content.
+ * @return {boolean} Whether the rendering succress.
+ */
+historyplus.SearchView.prototype.setContentSize = function(sizeWindow) {
+  if (!sizeWindow) return false;
+  if (!sizeWindow.width) return false;
+
+  var sizeSidebar = goog.style.getSize(this.domSidebar_);
+  var sizeHeader = goog.style.getSize(this.domHeader_);
+  var sizeListHeader = goog.style.getSize(this.domListHeader_);
+
+  // Set Content Width
+  var widthContent = sizeWindow.width - sizeSidebar.width;
+  if (widthContent < 800) widthContent = 800;
+  goog.style.setSize(this.domContent_, widthContent, 'auto');
+
+  // Set List Height
+  var heightContent = sizeWindow.height - sizeHeader.height;
+  if (heightContent < 400) heightContent = 400;
+  var heightList = heightContent;
+  if (sizeListHeader) {
+    heightList = heightList - sizeListHeader.height;
+  }
+  goog.style.setSize(this.domList_, 'auto', heightList);
+
+  // Set Sidebar Height;
+  goog.style.setSize(this.domSidebar_, sizeSidebar.width, heightContent);
+
+  return true;
+}
 
 /**
  * Append new domain item. it has HistoryItem array list.
@@ -368,7 +424,7 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
     }
     if (isDateLine) {
       var currentDate = this.dateFormatter_.format(this.rowDate_);
-      this.resultDiv_.appendChild(
+      this.domList_.appendChild(
         goog.dom.createDom('div', 'date', currentDate));
     }
   }
@@ -473,7 +529,7 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
 
   frameDiv.appendChild(itemDiv);
 
-  this.resultDiv_.appendChild(frameDiv);
+  this.domList_.appendChild(frameDiv);
   return true;
 };
 

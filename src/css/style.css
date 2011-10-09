@@ -6,14 +6,13 @@
 
 /*
  * 01. Common Styles
- * 02. Overwrite Closure Library CSS
- * 03. Common CSS
- * 04. Header
- * 05. Sidebar
- * 06. Contents
+ * 02. Layout(Width, Height of main frames)
+ * 03. Overwrite Closure Library CSS
+ * 04. Common CSS
+ * 05. Header
+ * 06. Sidebar
+ * 07. Contents
  */
-
-
 
 
 /*
@@ -23,6 +22,7 @@ body {
   background: #eee;
   margin: 0;
   padding: 0;
+  /*overflow: hidden;*/
   font-size: 12px;
   line-height: 1.5;
   color: #333;
@@ -34,7 +34,28 @@ input, select {vertical-align:middle;}
 
 
 /*
- * 02. Overwrite Closure Library CSS
+ * 02. Layout(Width, Height of main frames)
+ */
+header {
+  min-width: 980px;
+  height: 30px;
+}
+.content-frame {
+  min-width: 980px;
+}
+#sidebar {
+  width: 180px;
+}
+#content {
+  min-width: 800px;
+  min-height: 400px;
+}
+
+
+
+
+/*
+ * 03. Overwrite Closure Library CSS
  */
 /* Button */
 .goog-toggle-button,
@@ -50,10 +71,10 @@ input, select {vertical-align:middle;}
   background-image: url(../images/bg_toolbar.png);
 }
 .goog-toolbar-select {
-    margin: 0 10px;
+    margin: 0 6px;
 }
 .goog-toolbar .goog-toolbar-separator {
-    margin: 0 20px;
+    margin: 0 10px;
 }
 .goog-toolbar-select {}
   .goog-toolbar-select .goog-toolbar-menu-button-caption {
@@ -61,25 +82,28 @@ input, select {vertical-align:middle;}
     overflow: hidden;
     padding-left: 5px;
   }
-.goog-toolbar-menu-button-dropdown {
+.goog-toolbar-menu-button-dropdown,
+.goog-option-selected .goog-menuitem-checkbox,
+.goog-option-selected .goog-menuitem-icon,
+.goog-menu-button-dropdown {
   background-image: url(../images/icons_toolbar.png);
 }
 .goog-menuitem {
   border: 0;
-  padding: 4px 32px 4px 4px;
+  padding: 4px 20px 4px 28px;
 }
 /* Calendar */
 .goog-date-picker {
   background: #fff;
   border: none;
 }
-  .goog-date-picker td {
-  }
+  .goog-date-picker td {}
+
 
 
 
 /*
- * 03. Common CSS
+ * 04. Common CSS
  */
 .clear {clear: both;}
 .hp-text {border: 1px solid #bbb;}
@@ -104,16 +128,14 @@ input, select {vertical-align:middle;}
 
 
 /*
- * 04. Header
+ * 05. Header
  */
 header {
-  position: relative;
   background: #DDDDDD;
-  border-bottom: 1px solid #D5D5D5;
-  height: 30px;
-  min-width: 980px;
+  border-bottom: 1px solid #AAAAAA;
 }
   #header-toolbar {
+    position: relative;
     padding: 0 20px;
   }
 
@@ -133,9 +155,10 @@ header {
 
   /* Search Box */
   header .search-box {
-    width: 100px;
+    width: 120px;
     padding: 3px 5px;
     border-radius: 3px;
+    color: #000;
   }
   header #button-search .goog-custom-button-inner-box {
     background: url(../images/icons.png) -38px -0px no-repeat;
@@ -152,13 +175,14 @@ header {
   }
 
 
+
+
 /*
- * 04. Sidebar
+ * 06. Sidebar
  */
 #sidebar {
   float: left;
   background: #fff;
-  width: 180px;
   margin: 0;
   padding: 0;
 }
@@ -195,14 +219,27 @@ header {
 
 
 
+
 /*
- * 05. Contents
+ * 07. Contents
  */
 #content {
   float: right;
   background: #fff;
-  padding: 5px 0 20px;
+  margin: 0;
+  padding: 0;
 }
+  /* List Header */
+  #list-header {
+    background: #999;
+    height: 30px;
+    padding: 0 10px;
+  }
+
+  /* List */
+  #list-result {
+    border-left: 5px solid #999;
+  }
   #content .date {
     margin: 12px 0 5px;
     font-size: 1.1em;
