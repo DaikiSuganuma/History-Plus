@@ -50,6 +50,9 @@ header {
   min-width: 800px;
   min-height: 400px;
 }
+#list-header {
+  height: 36px;
+}
 
 
 
@@ -118,6 +121,8 @@ header {
 .hp-icon-calendar {background-position: -2px 0px;}
 .hp-icon-limit {background-position: -22px -1px;}
 .hp-icon-delete {background-position: -61px -1px;}
+.hp-icon-plus {background-position: -2px -21px;}
+.hp-icon-minus {background-position: -22px -21px;}
 
 .hp-insert-caption {
   padding: 0 2px;
@@ -206,7 +211,7 @@ header {
   #search-keywords {
     margin: 10px 0;
     padding-left: 10px;
-    border-top: 2px solid #999;
+    border-top: 2px solid #ddd;
   }
     #search-keyword-cloud h3,
     #search-keywords h3 {
@@ -231,14 +236,27 @@ header {
 }
   /* List Header */
   #list-header {
-    background: #999;
-    height: 30px;
+    position: relative;
+    background: #ddd;
     padding: 0 10px;
   }
+    #list-header-collapse {
+      margin: 3px 0 0;
+    }
+    #list-header-msg-system {
+      position: absolute;
+      top: 10px;
+      left: 45%;
+    }
+    #list-header-msg-result {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+    }
 
   /* List */
   #list-result {
-    border-left: 5px solid #999;
+    border-left: 5px solid #ddd;
   }
   #content .date {
     margin: 12px 0 5px;
