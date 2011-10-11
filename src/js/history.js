@@ -139,9 +139,8 @@ historyplus.SearchController.prototype.startApp = function() {
  * @return {boolean} Whether the search method is working correct.
  */
 historyplus.SearchController.prototype.searchHistory = function() {
-  return false;
-  this.view_.clear();
-  this.view_.setMessage('Searching ...');
+  this.view_.clearList();
+  this.view_.showMessage('Searching ...');
   var query = this.view_.getSeachCondition();
   return this.model_.search(query);
 };
@@ -186,18 +185,20 @@ historyplus.SearchModel.prototype.setView = function(view) {
 historyplus.SearchModel.prototype.search = function(query) {
   this.data_ = [];
   //check search condition
-  this.lastQuery = query || {};
-  this.lastQuery.text = query.text || '';
-  this.lastQuery.startTime = query.startTime || null;
-  this.lastQuery.endTime = query.endTime || null;
-  this.lastQuery.maxResults = query.maxResults || 100;
+  query = query || {};
+  query.text = query.text || '';
+  query.startTime = query.startTime || null;
+  query.endTime = query.endTime || null;
+  query.maxResults = query.maxResults || 100;
+
+  this.lastQuery = query;
 
   var self = this;
 
   //call chrome api
   //http://code.google.com/chrome/extensions/history.html#method-search
   chrome.history.search(query, function(results) {
-    self.view_.setMessage('');
+    self.view_.hideMessage();
     self.saveHistory(results);
   });
   return true;
@@ -206,17 +207,19 @@ historyplus.SearchModel.prototype.search = function(query) {
 
 /**
  * Callback function of 'chrome.history.search'.
- * Loop in search results and save history data.
+ * Loop in search results and group by domain.
  * @see http://code.google.com/chrome/extensions/history.html#type-HistoryItem
  * @param {array} itemList List of historyItem.
  */
 historyplus.SearchModel.prototype.saveHistory = function(itemList) {
   this.queryCount = itemList.length;
   if (itemList.length == 0) {
-    this.view_.setMessage('No Search Results');
+    this.view_.showMessage('No Search Results');
     return;
   }
-  var domainItem = {title: '', path: ''};
+  var domainItem = {};
+  domainItem.title = '';
+  domainItem.path = '';
   domainItem.list = [];
   var preTime = new goog.date.DateTime();
   if (this.lastQuery.endTime) preTime.setTime(this.lastQuery.endTime);
@@ -269,7 +272,9 @@ historyplus.SearchModel.prototype.saveHistory = function(itemList) {
       //draw line
       this.view_.addHistoryRow(domainItem, this.data_.length);
       //init container
-      domainItem = {title: '', path: ''};
+      domainItem = {};
+      domainItem.title = '';
+      domainItem.path = '';
       domainItem.list = [];
     }
   }
@@ -314,14 +319,15 @@ historyplus.SearchView = function(controller) {
   // Search Result Area
   this.domListHeader_ = null;
   this.domList_ = null;
+  this.domMessage_ = null;
   this.dateFormatter_ = null;
   this.timeFormatter_ = null;
 
   // Header
   this.toolbar_ = null;
 
-  // Variables to control list.
-  this.rowDate_ = null;
+  // the date to control drawing the list
+  this.dateTemp_ = null;
 };
 
 
@@ -349,6 +355,7 @@ historyplus.SearchView.prototype.init = function() {
 
   this.domListHeader_ = goog.dom.getElement('list-header');
   this.domList_ = goog.dom.getElement('list-result');
+  this.domMessage_ = goog.dom.getElement('list-header-message');
 
   // date format
   this.dateFormatter_ =
@@ -384,7 +391,6 @@ historyplus.SearchView.prototype.initHeader = function() {
   this.toolbar_ = new goog.ui.Toolbar();
   this.toolbar_.decorate(goog.dom.getElement('header-toolbar'));
 
-  console.log(this.toolbar_);
   // Date Range Select Menu
   var range = this.toolbar_.getChild('date-range');
   range.setSelectedIndex(5); //select "All"
@@ -423,7 +429,7 @@ historyplus.SearchView.prototype.initHeader = function() {
   var handler = cb.getHandler();
   handler.listen(cb.getKeyEventTarget(), goog.events.EventType.KEYUP,
     function(e) {
-      if (e.charCode == goog.events.KeyCodes.ENTER) {
+      if (e.keyCode == goog.events.KeyCodes.ENTER) {
         self.controller_.searchHistory();
       }
     });
@@ -474,19 +480,29 @@ historyplus.SearchView.prototype.initList = function() {
 /**
  * Clear HTML Contents for search results
  */
-historyplus.SearchView.prototype.clear = function() {
-  this.rowDate_ = null;
+historyplus.SearchView.prototype.clearList = function() {
+  this.dateTemp_ = null;
   this.domList_.innerHTML = '';
 };
 
 
 /**
- * Clear HTML Contents and set text message
+ * show the text message
  * @param {?string} opt_str The text is inserted to result div.
  */
-historyplus.SearchView.prototype.setMessage = function(opt_str) {
+historyplus.SearchView.prototype.showMessage = function(opt_str) {
   opt_str = opt_str || '';
-  this.domList_.innerHTML = opt_str;
+  this.domMessage_.innerHTML = opt_str;
+  goog.style.showElement(this.domMessage_, true);
+};
+
+
+/**
+ * Hide text message
+ */
+historyplus.SearchView.prototype.hideMessage = function() {
+  this.domMessage_.innerHTML = '';
+  goog.style.showElement(this.domMessage_, false);
 };
 
 
@@ -541,20 +557,20 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
     var isDateLine = false;
     if (dataNo == 1) isDateLine = true;
 
-    if (goog.date.Date.compare(this.rowDate_, endDate) > 0) {
-      if (!goog.date.isSameDay(this.rowDate_, endDate)) {
+    if (goog.date.Date.compare(this.dateTemp_, endDate) > 0) {
+      if (!goog.date.isSameDay(this.dateTemp_, endDate)) {
         isDateLine = true;
       }
-      this.rowDate_ = endDate;
+      this.dateTemp_ = endDate;
     }
     if (isDateLine) {
-      var currentDate = this.dateFormatter_.format(this.rowDate_);
+      var currentDate = this.dateFormatter_.format(this.dateTemp_);
       this.domList_.appendChild(
         goog.dom.createDom('div', 'date', currentDate));
     }
   }
 
-  var frameDiv = goog.dom.createDom('div', 'item-frame row');
+  var frameDiv = goog.dom.createDom('div', 'item-frame');
 
   //time
   var timeString = '-';
@@ -567,9 +583,9 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
       }
     }
   }
-  frameDiv.appendChild(goog.dom.createDom('div', 'time col col_2', timeString));
+  frameDiv.appendChild(goog.dom.createDom('div', 'time', timeString));
 
-  var itemDiv = goog.dom.createDom('div', 'item col col_10');
+  var itemDiv = goog.dom.createDom('div', 'item');
   //title & favicon
   itemDiv.appendChild(
     goog.dom.createDom('a',
@@ -604,7 +620,7 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
     var frameChildItem = goog.dom.createDom('div', 'child-frame');
     goog.style.showElement(frameChildItem, false);
     //collapse event bind
-    var toggleButton = goog.dom.createDom('div', 'button-toggle');
+    var toggleButton = goog.dom.createDom('div', 'hp-icon button-toggle');
     goog.events.listen(toggleButton, goog.events.EventType.CLICK, function(e) {
       var display = true;
       if (goog.style.isElementShown(frameChildItem)) {
@@ -705,43 +721,60 @@ historyplus.SearchView.prototype.getEndDate = function(domainItem) {
  */
 historyplus.SearchView.prototype.getSeachCondition = function() {
   var cond = {};
-  //search string
-  cond.text = goog.dom.getElement('text-search-box').value;
-  //date range
-  var button = goog.dom.query('#menu-date-range .goog-custom-button-checked');
-  if (button) button = button[0];
-  var range = null;
-  if (button.id == 'button-today') { //today
-    range = goog.date.DateRange.today();
-  } else if (button.id == 'button-yesterday') { //yesterday
-    range = goog.date.DateRange.yesterday();
-  } else if (button.id == 'button-last-week') { //last week
-    range = goog.date.DateRange.lastWeek();
-  } else if (button.id == 'button-last-month') { //last month
-    range = goog.date.DateRange.lastMonth();
-  } else {
-    range = goog.date.DateRange.allTime();
-  }
-  if (range) {
-    cond.startTime = range.getStartDate().getTime();
-    var endDate = goog.cloneObject(range.getEndDate()); //copy object
-    endDate.add(new goog.date.Interval(0, 0, 1)); //+1 day
-    cond.endTime = endDate.getTime();
+  var self = this;
 
-    // set start row date for draw search result
-    var today = new goog.date.Date();
-    this.rowDate_ = range.getEndDate();
-    if (goog.date.Date.compare(this.rowDate_, today) > 0) {
-      this.rowDate_ = today;
+  // Get date range
+  var element = this.toolbar_.getChild('date-range');
+  if (element) {
+    var range = null;
+    var item = element.getSelectedItem();
+    var value = item.getElement().getAttribute('value');
+    if (value == 'today') {
+      range = goog.date.DateRange.today();
+    } else if (value == 'yesterday') {
+      range = goog.date.DateRange.yesterday();
+    } else if (value == 'last-week') {
+      range = goog.date.DateRange.lastWeek();
+    } else if (value == 'last-month') {
+      range = goog.date.DateRange.lastMonth();
+    } else if (value == 'all') {
+      range = goog.date.DateRange.allTime();
+    }
+    if (range) {
+      cond.startTime = range.getStartDate().getTime();
+      var endDate = goog.cloneObject(range.getEndDate()); //copy object
+      endDate.add(new goog.date.Interval(0, 0, 1)); //+1 day
+      cond.endTime = endDate.getTime();
+
+      // Set start row date for search result.
+      var today = new goog.date.Date();
+      this.dateTemp_ = range.getEndDate();
+      if (goog.date.Date.compare(this.dateTemp_, today) > 0) {
+        this.dateTemp_ = today;
+      }
     }
   }
-  //max results
-  var button = goog.dom.query('#menu-max-results .goog-custom-button-checked');
-  if (button) button = button[0];
-  var count = parseInt(button.getAttribute('value'));
-  if (goog.isNumber(count)) {
-    cond.maxResults = count;
+
+  // Get limit amount
+  cond.maxResults = null;
+  goog.array.forEach(
+    goog.dom.query('#header .hp-limit-button'),
+    function(element) {
+      var button = self.toolbar_.getChild(element.id);
+      if (button.isChecked()) {
+        var count = parseInt(button.getElement().getAttribute('value'));
+        if (goog.isNumber(count)) {
+          cond.maxResults = count;
+        }
+      }
+    });
+
+  // Get Search String
+  var element = this.toolbar_.getChild('text-search-box');
+  if (element) {
+    cond.text = element.getValue();
   }
+
   return cond;
 };
 
