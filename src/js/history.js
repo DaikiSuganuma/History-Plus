@@ -36,9 +36,9 @@ goog.require('goog.date.DateRange');
 goog.require('goog.date.DateTime');
 goog.require('goog.date.Interval');
 goog.require('goog.dom');
+goog.require('goog.dom.ViewportSizeMonitor');
 goog.require('goog.dom.classes');
 goog.require('goog.dom.query');
-goog.require('goog.dom.ViewportSizeMonitor');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.events.KeyCodes');
@@ -48,8 +48,8 @@ goog.require('goog.i18n.DateTimeSymbols');
 goog.require('goog.i18n.DateTimeSymbols_en_ISO');
 goog.require('goog.math.Size');
 goog.require('goog.style');
-goog.require('goog.ui.Control');
 goog.require('goog.ui.ComboBox');
+goog.require('goog.ui.Control');
 goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.DatePicker');
 goog.require('goog.ui.Menu');
@@ -59,9 +59,9 @@ goog.require('goog.ui.SelectionModel');
 goog.require('goog.ui.Separator');
 goog.require('goog.ui.ToggleButton');
 goog.require('goog.ui.Toolbar');
-goog.require('goog.ui.ToolbarRenderer');
 goog.require('goog.ui.ToolbarButton');
 goog.require('goog.ui.ToolbarMenuButton');
+goog.require('goog.ui.ToolbarRenderer');
 goog.require('goog.ui.ToolbarSelect');
 goog.require('goog.ui.ToolbarSeparator');
 goog.require('goog.ui.ToolbarToggleButton');
@@ -85,7 +85,7 @@ var historyplus = historyplus || {};
  */
 historyplus.copyProperties = function(child, parent) {
   for (var prop in parent) {
-    if (typeof(child[prop]) == 'undefined') { 
+    if (typeof(child[prop]) == 'undefined') {
       child[prop] = parent[prop];
     }
   }
@@ -93,7 +93,8 @@ historyplus.copyProperties = function(child, parent) {
 
 
 /**
- * Inherit the properties and prototype methods from one constructor into another.
+ * Inherit the properties and prototype methods from parent constructor
+ * into child.
  *
  * @param {Function} child Child class.
  * @param {Function} parent Parent class.
@@ -440,7 +441,7 @@ historyplus.SearchView.prototype.initHeader = function() {
     function(e) {
       self.handleDeleteHistoryChange(e);
     });
-  
+
 };
 
 
@@ -508,6 +509,7 @@ historyplus.SearchView.prototype.hideMessage = function() {
 
 /**
  * Set width and height of content.
+ * @param {object} sizeWindow Includes the window width and height.
  * @return {boolean} Whether the rendering succress.
  */
 historyplus.SearchView.prototype.setContentSize = function(sizeWindow) {

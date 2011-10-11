@@ -4,15 +4,15 @@
 // found in the LICENSE file.
 
 /**
- * @fileoverview Simply extends goog.ui.ComboBox to add to toolbar
+ * @fileoverview Simply extends goog.ui.ComboBox to add to toolbar.
  *
  * @see http://code.google.com/p/closure-library/wiki/IntroToControls
  */
 
 goog.provide('historyplus.ComboBoxControl');
 
-goog.require('goog.ui.Control');
 goog.require('goog.ui.ComboBox');
+goog.require('goog.ui.Control');
 
 
 /**
