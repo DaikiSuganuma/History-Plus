@@ -41,15 +41,17 @@ goog.require('goog.dom.query');
 goog.require('goog.dom.ViewportSizeMonitor');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
+goog.require('goog.events.KeyCodes');
 goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.i18n.DateTimeParse');
 goog.require('goog.i18n.DateTimeSymbols');
 goog.require('goog.i18n.DateTimeSymbols_en_ISO');
 goog.require('goog.math.Size');
 goog.require('goog.style');
+goog.require('goog.ui.Control');
+goog.require('goog.ui.ComboBox');
 goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.DatePicker');
-goog.require('goog.ui.LabelInput');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
 goog.require('goog.ui.Option');
@@ -65,12 +67,41 @@ goog.require('goog.ui.ToolbarSeparator');
 goog.require('goog.ui.ToolbarToggleButton');
 goog.require('goog.ui.decorate');
 
+goog.require('historyplus.ComboBoxControl');
+
 
 /**
  * Base namespace for History Plus.
  * @const
  **/
 var historyplus = historyplus || {};
+
+
+/**
+ * Copy the properties. This method is called by historyplus.inherits.
+ *
+ * @param {Object} child Child property.
+ * @param {Object} parent Parent property.
+ */
+historyplus.copyProperties = function(child, parent) {
+  for (var prop in parent) {
+    if (typeof(child[prop]) == 'undefined') { 
+      child[prop] = parent[prop];
+    }
+  }
+};
+
+
+/**
+ * Inherit the properties and prototype methods from one constructor into another.
+ *
+ * @param {Function} child Child class.
+ * @param {Function} parent Parent class.
+ */
+historyplus.inherits = function(child, parent) {
+  historyplus.copyProperties(child, parent);
+  historyplus.copyProperties(child.prototype, parent.prototype);
+};
 
 
 
@@ -90,6 +121,7 @@ historyplus.SearchController = function() {
   this.startApp();
 };
 
+
 /**
  * Call rendering method and begin search method.
  */
@@ -98,14 +130,16 @@ historyplus.SearchController.prototype.startApp = function() {
   this.view_.init();
 
   //excute search method
-  //this.searchHistory();
+  this.searchHistory();
 };
+
 
 /**
  * Search History
  * @return {boolean} Whether the search method is working correct.
  */
 historyplus.SearchController.prototype.searchHistory = function() {
+  return false;
   this.view_.clear();
   this.view_.setMessage('Searching ...');
   var query = this.view_.getSeachCondition();
@@ -133,6 +167,7 @@ historyplus.SearchModel = function(controller) {
   this.queryCount = 0;
 };
 
+
 /**
  * Sets our current view that is called when the history model changes.
  * @param {historyplus.SearchView} view The view to set our current view to.
@@ -140,6 +175,7 @@ historyplus.SearchModel = function(controller) {
 historyplus.SearchModel.prototype.setView = function(view) {
   this.view_ = view;
 };
+
 
 /**
  * Wrapper for chrome.history.search
@@ -166,6 +202,7 @@ historyplus.SearchModel.prototype.search = function(query) {
   });
   return true;
 };
+
 
 /**
  * Callback function of 'chrome.history.search'.
@@ -238,6 +275,7 @@ historyplus.SearchModel.prototype.saveHistory = function(itemList) {
   }
 };
 
+
 /**
  * Callback function of 'chrome.history.getVisits'.
  * Loop in search results and save visit to object.
@@ -268,24 +306,24 @@ historyplus.SearchModel.prototype.saveVisits = function(itemList) {
 historyplus.SearchView = function(controller) {
   this.controller_ = controller;
 
-  // frames
+  // Frames
   this.domHeader_ = null;
   this.domContent_ = null;
   this.domSidebar_ = null;
 
-  //Header Area
-  this.menuDateRage_ = [];
-  this.menuMaxResults_ = [];
-
-  //Search Result Area
+  // Search Result Area
   this.domListHeader_ = null;
   this.domList_ = null;
   this.dateFormatter_ = null;
   this.timeFormatter_ = null;
 
-  //Variables to control list.
+  // Header
+  this.toolbar_ = null;
+
+  // Variables to control list.
   this.rowDate_ = null;
 };
+
 
 /**
  * Escapes a URI as appropriate for CSS.
@@ -296,6 +334,7 @@ historyplus.SearchView = function(controller) {
 historyplus.SearchView.prototype.getEncodeURIForCSS = function(uri) {
   return uri.replace(/\(/g, '\\(').replace(/\)/g, '\\)');
 };
+
 
 /**
  * Initialize the mouse and submit event on header
@@ -334,23 +373,70 @@ historyplus.SearchView.prototype.init = function() {
   this.initList();
 };
 
+
 /**
  * Initialize Elements on Header
  */
 historyplus.SearchView.prototype.initHeader = function() {
-  // Create header menu toolbar.
-  var toolbar = new goog.ui.Toolbar();
-  toolbar.decorate(goog.dom.getElement('header-toolbar'));
+  var self = this;
 
-  // Search Text input
-  var li = new goog.ui.LabelInput;
-  li.decorate(goog.dom.getElement('text-search-box'));
-  var button = goog.ui.decorate(goog.dom.getElement('button-search'));
+  // Create header menu toolbar.
+  this.toolbar_ = new goog.ui.Toolbar();
+  this.toolbar_.decorate(goog.dom.getElement('header-toolbar'));
+
+  console.log(this.toolbar_);
+  // Date Range Select Menu
+  var range = this.toolbar_.getChild('date-range');
+  range.setSelectedIndex(5); //select "All"
+  goog.events.listen(range, goog.ui.Component.EventType.ACTION,
+    function(e) {
+      self.handleDateRangeChange(e);
+    });
+
+  // Limit Button
+  goog.array.forEach(
+    goog.dom.query('#header .hp-limit-button'),
+    function(element, index) {
+      var button = self.toolbar_.getChild(element.id);
+      if (index == 0) {
+        button.setChecked(true);
+      }
+      goog.events.listen(button, goog.ui.Component.EventType.ACTION,
+        function(e) {
+          self.handleLimitClick(e);
+        });
+    });
+
+  // Search Button
+  var button = this.toolbar_.getChild('button-search');
   goog.events.listen(button, goog.ui.Component.EventType.ACTION,
     function(e) {
       self.controller_.searchHistory();
     });
+  // Set text input by using ComboBoxControl
+  var cb = new historyplus.ComboBoxControl();
+  cb.setUseDropdownArrow(false);
+  cb.setDefaultText('Filter by keyword');
+  cb.setId('text-search-box');
+  this.toolbar_.addChildAt(cb, this.toolbar_.indexOfChild(button), true);
+  // Bind enter key press in text box.
+  var handler = cb.getHandler();
+  handler.listen(cb.getKeyEventTarget(), goog.events.EventType.KEYUP,
+    function(e) {
+      if (e.charCode == goog.events.KeyCodes.ENTER) {
+        self.controller_.searchHistory();
+      }
+    });
+
+  // Delete History button
+  var deleteHistory = this.toolbar_.getChild('delete-history');
+  goog.events.listen(deleteHistory, goog.ui.Component.EventType.ACTION,
+    function(e) {
+      self.handleDeleteHistoryChange(e);
+    });
+  
 };
+
 
 /**
  * Initialize Elements on Sidebar
@@ -365,6 +451,7 @@ historyplus.SearchView.prototype.initSidebar = function() {
   calendar.setUseSimpleNavigationMenu(true);
   calendar.render(goog.dom.getElement('sidebar-calendar'));
 };
+
 
 /**
  * Initialize Elements on List Header
@@ -383,6 +470,7 @@ historyplus.SearchView.prototype.initList = function() {
     });
 };
 
+
 /**
  * Clear HTML Contents for search results
  */
@@ -390,6 +478,7 @@ historyplus.SearchView.prototype.clear = function() {
   this.rowDate_ = null;
   this.domList_.innerHTML = '';
 };
+
 
 /**
  * Clear HTML Contents and set text message
@@ -399,6 +488,7 @@ historyplus.SearchView.prototype.setMessage = function(opt_str) {
   opt_str = opt_str || '';
   this.domList_.innerHTML = opt_str;
 };
+
 
 /**
  * Set width and height of content.
@@ -431,6 +521,7 @@ historyplus.SearchView.prototype.setContentSize = function(sizeWindow) {
 
   return true;
 };
+
 
 /**
  * Append new domain item. it has HistoryItem array list.
@@ -567,6 +658,7 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
   return true;
 };
 
+
 /**
  * Get start date from list
  * @param {object} domainItem A object that has HistoryItem of same domain.
@@ -586,6 +678,7 @@ historyplus.SearchView.prototype.getStartDate = function(domainItem) {
   return date;
 };
 
+
 /**
  * Get end date from list
  * @param {object} domainItem A object that has HistoryItem of same domain.
@@ -604,6 +697,7 @@ historyplus.SearchView.prototype.getEndDate = function(domainItem) {
   }
   return date;
 };
+
 
 /**
  * Collect search condition from header menu.
@@ -651,43 +745,59 @@ historyplus.SearchView.prototype.getSeachCondition = function() {
   return cond;
 };
 
+
 /**
- * Action Event when Date Rage Menu click
+ * Action Event when Date Rage in header toolbar is changed
+ * @param {object} e Event object.
+ * @return {boolean} Whether the action event end correctly.
+ */
+historyplus.SearchView.prototype.handleDateRangeChange = function(e) {
+  //excute search method
+  this.controller_.searchHistory();
+  return true;
+};
+
+
+/**
+ * Action Event when limit bottun in header toolbar is clicked
  * @param {object} e Event object.
  * @return {boolean} Whether the click event end correctly.
  */
-historyplus.SearchView.prototype.handleMenuDateRageClick = function(e) {
-  //all button check false
-  goog.array.forEach(this.menuDateRage_, function(button) {
-    button.setChecked(false);
-  });
+historyplus.SearchView.prototype.handleLimitClick = function(e) {
+  var self = this;
+  goog.array.forEach(
+    goog.dom.query('#header .hp-limit-button'),
+    function(element) {
+      var button = self.toolbar_.getChild(element.id);
+      button.setChecked(false);
+    });
+
   e.target.setChecked(true);
 
-  //excute search
+  //excute search method
   this.controller_.searchHistory();
   return true;
 };
+
 
 /**
- * Action Event when Max Results Menu click
+ * Action Event when Delete History in header toolbar is changed
  * @param {object} e Event object.
- * @return {boolean} Whether the click event end correctly.
+ * @return {boolean} Whether the action event end correctly.
  */
-historyplus.SearchView.prototype.handleMenuMaxResultsClick = function(e) {
-  goog.array.forEach(this.menuMaxResults_, function(button) {
-    button.setChecked(false);
-  });
-  event.target.setChecked(true);
-
-  //excute search
-  this.controller_.searchHistory();
+historyplus.SearchView.prototype.handleDeleteHistoryChange = function(e) {
+  console.log(e);
+  if (confirm('Are you sure that all history is deleted?')) {
+  }
   return true;
 };
+
 
 
 
 //set that this controller should be singleton
 goog.addSingletonGetter(historyplus.SearchController);
+
 
 //get instance
 historyplus.SearchController.getInstance();

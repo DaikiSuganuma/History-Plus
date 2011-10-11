@@ -61,6 +61,7 @@ header {
  * 03. Overwrite Closure Library CSS
  */
 /* Button */
+.goog-combobox,
 .goog-toggle-button,
 .goog-custom-button  {
   display: inline-block;
@@ -73,28 +74,31 @@ header {
 .goog-toolbar {
   background-image: url(../images/bg_toolbar.png);
 }
-.goog-toolbar-select {
+  .goog-toolbar-select {
     margin: 0 6px;
-}
-.goog-toolbar .goog-toolbar-separator {
-    margin: 0 10px;
-}
-.goog-toolbar-select {}
-  .goog-toolbar-select .goog-toolbar-menu-button-caption {
-    width: auto;
-    overflow: hidden;
-    padding-left: 5px;
   }
-.goog-toolbar-menu-button-dropdown,
-.goog-option-selected .goog-menuitem-checkbox,
-.goog-option-selected .goog-menuitem-icon,
-.goog-menu-button-dropdown {
-  background-image: url(../images/icons_toolbar.png);
-}
-.goog-menuitem {
-  border: 0;
-  padding: 4px 20px 4px 28px;
-}
+  .goog-toolbar .goog-toolbar-separator {
+    margin: 0 10px;
+  }
+  .goog-toolbar .goog-combobox {
+    background: transparent;
+  }
+  .goog-toolbar-select {}
+    .goog-toolbar-select .goog-toolbar-menu-button-caption {
+      width: auto;
+      overflow: hidden;
+      padding-left: 5px;
+    }
+  .goog-toolbar-menu-button-dropdown,
+  .goog-option-selected .goog-menuitem-checkbox,
+  .goog-option-selected .goog-menuitem-icon,
+  .goog-menu-button-dropdown {
+    background-image: url(../images/icons_toolbar.png);
+  }
+  .goog-menuitem {
+    border: 0;
+    padding: 4px 20px 4px 28px;
+  }
 /* Calendar */
 .goog-date-picker {
   background: #fff;
@@ -109,8 +113,6 @@ header {
  * 04. Common CSS
  */
 .clear {clear: both;}
-.hp-text {border: 1px solid #bbb;}
-.hp-text:focus {border-color: #666;}
 .hp-icon {
   background-image: url(../images/icons.png);
   width: 16px;
@@ -143,6 +145,9 @@ header {
     position: relative;
     padding: 0 20px;
   }
+  header div.hp-icon {
+    margin-right: 5px;
+  }
 
   /* Date Range */
   #date-range {}
@@ -159,18 +164,27 @@ header {
     }
 
   /* Search Box */
-  header .search-box {
-    width: 120px;
-    padding: 3px 5px;
-    border-radius: 3px;
-    color: #000;
+  #text-search-box {
+    vertical-align: middle;
   }
-  header #button-search .goog-custom-button-inner-box {
-    background: url(../images/icons.png) -38px -0px no-repeat;
-    width: 16px;
-    height: 16px;
-    background-repeat: no-repeat;
-  }
+    #text-search-box.goog-combobox {
+      border: none;
+    }
+    #text-search-box.goog-combobox input {
+      width: 120px;
+      border-radius: 3px;
+      border: 1px solid #BFCBDF;
+      padding: 3px 4px;
+    }
+    #text-search-box .goog-combobox-button {
+      display: none;
+    }
+    header #button-search .goog-custom-button-inner-box {
+      background: url(../images/icons.png) -38px -0px no-repeat;
+      width: 16px;
+      height: 16px;
+      background-repeat: no-repeat;
+    }
 
   /* Delete History */
   header #delete-history {
