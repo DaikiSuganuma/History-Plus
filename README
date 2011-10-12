@@ -1,4 +1,7 @@
-History Plus overrides default history page.
+History Plus is an Google Chrome Extension.
+If you install it, default history page(Ctrl-H) is replaced the nice one.
+Please go to the page on Chrome Web Store:
+https://chrome.google.com/webstore/detail/mmeiidaaeapionnjaheefgcflidanoeg
 
 
 -----------------------
@@ -6,34 +9,29 @@ Features
 -----------------------
  - Select date range easier: Today, Yesterday, Last Week, Last Month, All
  - Select max result number easier: 100, 250, 500, 1000
- - Delete all history
+ - Delete history
  - Grouping same domain in the list
  - Show visit counts each url in the list
 
 
 -----------------------
-Todo
+How to compile by Closure Compiler
 -----------------------
- - i18n
- - Limit string
- - Select date range by using calendar
- - History detail when visit count is clicked
- - Adjust line space by comparing pre-time
- - Show calendar, and color highlight that focus on the current date in calendar is following as you scroll.
- - New useful design like Gmail + iPad
+If you have not installed the Closure Compiler,
+please visit the official site and read the document.
+
+http://code.google.com/closure/compiler/
 
 
------------------------
-Author
------------------------
-http://se-suganuma.blogspot.com/
+the command is below(windows):
 
-* this source code is public in GitHub.
-https://github.com/DaikiSuganuma/History-Plus
+1. move to project directory.
 
------------------------
-Change Log
------------------------
-v1.1.0
- - First release
+> cd "C:\Users\Owner\Develop\Google Chrome Extension\history-plus\git\src"
+
+2. combine files.
+
+> C:\Python27\python.exe "closure-library\closure\bin\build\closurebuilder.py" --root="closure-library" --root="js" --namespace="historyplus.SearchController" --output_mode=compiled --compiler_jar="..\..\..\compiler.jar" --output_file="js\history.min.js"
+
+
 

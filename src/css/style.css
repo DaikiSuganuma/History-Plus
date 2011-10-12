@@ -1,150 +1,349 @@
 /*
- * Copyright (c) 2011 Daiki Suganuma. All rights reserved.
- * Use of this source code is governed by a BSD-style license that can be
+ * Copyright (c) 2011 History Plus Authors. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be
  * found in the LICENSE file.
  */
 
 /*
  * 01. Common Styles
- * 02. Header
- * 03. Contents
- * 99. Footer
+ * 02. Layout(Width, Height of main frames)
+ * 03. Overwrite Closure Library CSS
+ * 04. Common CSS
+ * 05. Header
+ * 06. Sidebar
+ * 07. Contents
  */
 
 
 /*
- * 01. Common Styles
+ * 01. Reset
  */
 body {
   background: #eee;
+  margin: 0;
+  padding: 0;
+  /*overflow: hidden;*/
   font-size: 12px;
   line-height: 1.5;
   color: #333;
   font-family: Arial, Helvetica, sans-serif;
 }
-.clear {clear: both;}
-.text {border:1px solid #bbb;}
-.text:focus {border-color:#666;}
-a {}
-a:hover {}
-.hide {display: none;}
+input, select {vertical-align:middle;}
+
+
+
 
 /*
- * 02. Closure Library CSS
+ * 02. Layout(Width, Height of main frames)
  */
+header {
+  min-width: 980px;
+  height: 30px;
+}
+.content-frame {
+  min-width: 980px;
+}
+#sidebar {
+  width: 180px;
+}
+#content {
+  min-width: 800px;
+  min-height: 400px;
+}
+#list-header {
+  height: 36px;
+}
+
+
+
+
+/*
+ * 03. Overwrite Closure Library CSS
+ */
+/* Button */
+.goog-combobox,
 .goog-toggle-button,
 .goog-custom-button  {
   display: inline-block;
   background-image: url(../images/bg_button.png);
 }
+.goog-custom-button-inner-box {
+  cursor: pointer;
+}
+/* Toolbar */
+.goog-toolbar {
+  background-image: url(../images/bg_toolbar.png);
+}
+  .goog-toolbar-select {
+    margin: 0 6px;
+  }
+  .goog-toolbar .goog-toolbar-separator {
+    margin: 0 10px;
+  }
+  .goog-toolbar .goog-combobox {
+    background: transparent;
+  }
+  .goog-toolbar-select {}
+    .goog-toolbar-select .goog-toolbar-menu-button-caption {
+      width: auto;
+      overflow: hidden;
+      padding-left: 5px;
+    }
+  .goog-toolbar-menu-button-dropdown,
+  .goog-option-selected .goog-menuitem-checkbox,
+  .goog-option-selected .goog-menuitem-icon,
+  .goog-menu-button-dropdown {
+    background-image: url(../images/icons_toolbar.png);
+  }
+  .goog-menuitem {
+    border: 0;
+    padding: 4px 20px 4px 28px;
+  }
+/* Calendar */
+.goog-date-picker {
+  background: #fff;
+  border: none;
+}
+  .goog-date-picker td {}
+
+
+
 
 /*
- * 02. Header
+ * 04. Common CSS
+ */
+.clear {clear: both;}
+.hp-icon {
+  background-image: url(../images/icons.png);
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.hp-icon-calendar {background-position: -2px 0px;}
+.hp-icon-limit {background-position: -22px -1px;}
+.hp-icon-delete {background-position: -61px -1px;}
+.hp-icon-plus {background-position: -2px -21px;}
+.hp-icon-minus {background-position: -22px -21px;}
+
+.hp-insert-caption {
+  padding: 0 2px;
+  vertical-align: bottom;
+}
+
+
+
+
+/*
+ * 05. Header
  */
 header {
   background: #DDDDDD;
-  border-bottom: 1px solid #D5D5D5;
-  
+  border-bottom: 1px solid #AAAAAA;
 }
-  header .col {
-    padding: 5px 0;
+  #header-toolbar {
+    position: relative;
+    padding: 0 20px;
   }
-  header .logo {
-    text-align: center;
-    padding: 8px 0 0;
+  header div.hp-icon {
+    margin-right: 5px;
   }
+
+  /* Date Range */
+  #date-range {}
+    #date-range .goog-toolbar-menu-button-caption {
+      width: 80px;
+    }
+    .date-range-separator {
+      color: #aaa;
+    }
+  /* Max Results */
+  #max-results {}
+    #max-results .goog-toolbar-menu-button-caption {
+      width: 60px;
+    }
 
   /* Search Box */
-  header .search-box {
-    width: 100px;
-    padding: 4px 5px;
-    border-radius: 5px;
-  }
-  header #button-search .goog-custom-button-inner-box {
-    height: 16px;
-    width: 16px;
-    background: url(../images/bg_search_box.png) 50% 50% no-repeat;
+  #text-search-box {
     vertical-align: middle;
   }
-#menu-date-range,
-#menu-max-results,
-#searchbox-frame {
-  display: inline-block;
-  margin-right: 10px;
-}
-header .goog-custom-button-inner-box {
-  cursor: pointer;
-  padding: 3px 8px;
-}
-#button-delete-history {
-  color: #dd0000;
-}
+    #text-search-box.goog-combobox {
+      border: none;
+    }
+    #text-search-box.goog-combobox input {
+      width: 120px;
+      border-radius: 3px;
+      border: 1px solid #BFCBDF;
+      padding: 3px 4px;
+    }
+    #text-search-box .goog-combobox-button {
+      display: none;
+    }
+    header #button-search .goog-custom-button-inner-box {
+      background: url(../images/icons.png) -38px -0px no-repeat;
+      width: 16px;
+      height: 16px;
+      background-repeat: no-repeat;
+    }
+
+  /* Delete History */
+  header #delete-history {
+    position: absolute;
+    top: 0;
+    right: 20px;
+  }
+
+
 
 
 /*
- * 03. Contents
+ * 06. Sidebar
+ */
+#sidebar {
+  float: left;
+  background: #fff;
+  margin: 0;
+  padding: 0;
+}
+  /* Sidebar Calendar */
+  #sidebar .sidebar-calendar-frame {
+    margin: 10px auto;
+  }
+  #sidebar-calendar {}
+    #sidebar-calendar .goog-date-picker {
+      float: none;
+    }
+    #sidebar-calendar .goog-date-picker table {
+      width: 100%;
+    }
+
+  /* Search Widget */
+  #sidebar .sidebar-widget-frame {
+    margin: 10px 0 0 0;
+  }
+  .sidebar-widget {
+    margin: 10px 0;
+    padding-left: 10px;
+    border-top: 2px solid #ddd;
+  }
+    .sidebar-widget h3 {
+      margin: 5px 0;
+      font-size: 12px;
+    }
+    .sidebar-widget-content {
+      padding: 0 5px;
+      color: #aaa;
+    }
+  /* Search Keyword */
+  #search-keywords {
+  }
+  /* Search Keyword Cloud */
+  #search-keyword-cloud {
+  }
+
+
+
+
+/*
+ * 07. Contents
  */
 #content {
+  float: right;
   background: #fff;
-  padding: 5px 0 20px;
+  margin: 0;
+  padding: 0;
 }
-  #content .date {
-    margin: 12px 0 5px;
-    font-size: 1.1em;
-    font-weight: bold;
+  /* List Header */
+  #list-header {
+    position: relative;
+    background: #ddd;
+    padding: 0 10px;
   }
-  #content .item-frame {}
-    #content .item-frame .time {
-      text-align: right;
-      color: #999;
+    #list-header-collapse {
+      margin: 3px 0 0;
+    }
+    #list-header-message {
+      position: absolute;
+      top: 5px;
+      left: 40%;
+      background: #FBF9EE;
+      border: 1px solid #FCEFA1;
+      color: #363636;
+      padding: 3px 20px;
+    }
+    #list-header-result-text {
+      position: absolute;
+      top: 10px;
+      right: 20px;
     }
 
-    #content .item {
-      position: relative;
-      overflow: visible;
-    }
-      #content .item .title {
-        display: inline-block;
-        padding: 1px 0 0 22px;
-      }
-      #content .item .visit-count,
-      #content .item .page-count {
-        margin-left: 10px;
-        font-size: 0.9em;
-        white-space: nowrap;
-      }
-      #content .item .button-toggle {
-        position: absolute;
-        top: 0;
-        left: -18px;
-        background: url(../images/bg_plus_minus.png) 0 0 no-repeat;
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-      }
-      #content .item .button-toggle.close {
-        background-position: -24px 0;
-      }
-
-    #content .item-child .title {
-      padding-left: 10px;
-    }
-
-
-/*
- * 99. Footer
- */
-footer.row {
-  background-color: #DDDDDD;
-  border-top: 1px solid #999999;
-  padding: 5px 0 20px;
-}
-  footer .goto-top {}
-    footer .goto-top a {
-      background: url(../images/bg_goto_top.png) no-repeat 2% 50%;
-      padding-left: 12px;
-    }
-  footer .generator {
-    text-align: right;
+  /* List */
+  #list-result {
+    border-left: 5px solid #ddd;
+    overflow-y: scroll;
   }
+    #list-result .date {
+      background: #eee;
+      margin: 10px 0 5px 0;
+      padding: 3px 10px;
+      font-size: 1.1em;
+      font-weight: bold;
+      clear: both;
+    }
+    #list-result .item-frame {
+      clear: both;
+    }
+      #list-result .item-frame .time {
+        float: left;
+        width: 80px;
+        text-align: right;
+        color: #999;
+      }
+      #list-result .item {
+        position: relative;
+        overflow: visible;
+        margin-left: 100px;
+      }
+        #list-result .item .time {
+          width: 40px;
+        }
+        #list-result .item .title {
+          display: inline-block;
+          padding: 1px 0 0 22px;
+        }
+        #list-result .item .visit-count,
+        #list-result .item .page-count {
+          margin-left: 10px;
+          font-size: 0.9em;
+          white-space: nowrap;
+        }
+        #list-result .item .button-toggle {
+          position: absolute;
+          top: 0;
+          left: -18px;
+          background-position: -1px -21px;
+          cursor: pointer;
+        }
+        #list-result .item .button-toggle.close {
+          background-position: -21px -21px;
+        }
+        #list-result .item-child .title {
+          padding-left: 10px;
+        }
+
+  #list-result .list-footer {
+    clear: both;
+    margin: 10px 0 50px;
+    padding: 10px 10px;
+  }
+
+  /* Adjust line height by elapsed time */
+  #list-result .elapsed-hour-0 {margin-top:0;}
+  #list-result .elapsed-hour-1 {margin-top:5px;}
+  #list-result .elapsed-hour-2 {margin-top:10px;}
+  #list-result .elapsed-hour-3 {margin-top:15px;}
+  #list-result .elapsed-hour-4 {margin-top:20px;}
+  #list-result .elapsed-hour-5 {margin-top:25px;}
+  #list-result .elapsed-hour-6more {margin-top:30px;}
+  #list-result .todays-first {margin-top:0;}
 
