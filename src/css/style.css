@@ -217,21 +217,26 @@ header {
       width: 100%;
     }
 
-  /* Search Keyword */
-  #sidebar .search-keywords-frame {
+  /* Search Widget */
+  #sidebar .sidebar-widget-frame {
     margin: 10px 0 0 0;
   }
-  #search-keyword-cloud,
-  #search-keywords {
+  .sidebar-widget {
     margin: 10px 0;
     padding-left: 10px;
     border-top: 2px solid #ddd;
   }
-    #search-keyword-cloud h3,
-    #search-keywords h3 {
+    .sidebar-widget h3 {
       margin: 5px 0;
       font-size: 12px;
     }
+    .sidebar-widget-content {
+      padding: 0 5px;
+      color: #aaa;
+    }
+  /* Search Keyword */
+  #search-keywords {
+  }
   /* Search Keyword Cloud */
   #search-keyword-cloud {
   }

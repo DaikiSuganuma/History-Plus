@@ -136,7 +136,7 @@ historyplus.SearchController.prototype.startApp = function() {
 
 
 /**
- * Search History
+ * Call the search method in model class.
  * @return {boolean} Whether the search method is working correct.
  */
 historyplus.SearchController.prototype.searchHistory = function() {
@@ -144,6 +144,24 @@ historyplus.SearchController.prototype.searchHistory = function() {
   this.view_.showMessage('Searching ...');
   var query = this.view_.getSeachCondition();
   return this.model_.search(query);
+};
+
+
+/**
+ * Get the array container of result data.
+ * @return {array} Search result data.
+ */
+historyplus.SearchController.prototype.getSearchData = function() {
+  return this.model_.data_;
+};
+
+
+/**
+ * How many url hits.
+ * @return {number} The amount of results that chrome.history.search is called.
+ */
+historyplus.SearchController.prototype.getQueryCount = function() {
+  return this.model_.queryCount;
 };
 
 
@@ -164,7 +182,7 @@ historyplus.SearchModel = function(controller) {
 
   //public
   this.lastQuery = null;
-  this.queryCount = 0;
+  this.queryCount = null;
 };
 
 
@@ -185,6 +203,7 @@ historyplus.SearchModel.prototype.setView = function(view) {
  */
 historyplus.SearchModel.prototype.search = function(query) {
   this.data_ = [];
+  this.queryCount = 0;
   //check search condition
   query = query || {};
   query.text = query.text || '';
@@ -200,9 +219,8 @@ historyplus.SearchModel.prototype.search = function(query) {
   //http://code.google.com/chrome/extensions/history.html#method-search
   chrome.history.search(query, function(results) {
     self.view_.hideMessage();
-    if (self.saveHistory(results)) {
-      self.view_.handleFinishList();
-    }
+    self.saveHistory(results);
+    self.view_.handleFinishList();
   });
   return true;
 };
@@ -566,8 +584,10 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
   var startDate = this.getStartDate(domainItem);
   var endDate = this.getEndDate(domainItem);
 
-  // Add css class name
-  var addClass = this.getAddClass(domainItem);
+  // css class name builder
+  var frameCssClass = [];
+  frameCssClass.push('item-frame');
+  frameCssClass.push(this.getAddClass(domainItem));
 
   //check whether it should show date line.
   if (endDate) {
@@ -584,10 +604,10 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
       var currentDate = this.dateFormatter_.format(this.dateTemp_);
       this.domList_.appendChild(
         goog.dom.createDom('div', 'date', currentDate));
-      addClass += ' todays-first';
+      frameCssClass.push('todays-first'); // add css class
     }
   }
-  var frameDiv = goog.dom.createDom('div', 'item-frame ' + addClass);
+  var frameDiv = goog.dom.createDom('div', frameCssClass.join(' '));
 
   //time
   var timeString = '-';
@@ -621,7 +641,7 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
         goog.dom.createDom('span',
           'visit-count',
           goog.dom.createTextNode('( '),
-          goog.dom.createDom('a', {'href': '#'}, item.visitCount + ' times'),
+          goog.dom.createDom('a', {}, item.visitCount + ' times'),
           goog.dom.createTextNode(' )')));
     }
   } else {
@@ -668,7 +688,7 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
       childDiv.appendChild(
         goog.dom.createDom('span', 'visit-count',
           goog.dom.createTextNode('( '),
-          goog.dom.createDom('a', {'href': '#'}, child.visitCount + ' times'),
+          goog.dom.createDom('a', {}, child.visitCount + ' times'),
           goog.dom.createTextNode(' )')));
 
       frameChildItem.appendChild(childDiv);
@@ -820,8 +840,19 @@ historyplus.SearchView.prototype.getSeachCondition = function() {
  * @return {boolean} Whether the action end correctly.
  */
 historyplus.SearchView.prototype.handleFinishList = function() {
+  // Insert element for bottom space.
   var dom = goog.dom.createDom('div', 'list-footer', '');
   this.domList_.appendChild(dom);
+
+  // Update the result text.
+  var data = this.controller_.getSearchData();
+  var count = this.controller_.getQueryCount();
+  var msg = [];
+  msg.push(data.length + ' domain');
+  msg.push(count + ' url');
+  var dom = goog.dom.getElement('list-header-result-text');
+  dom.innerText = msg.join(', ');
+
   return true;
 };
 
@@ -863,10 +894,10 @@ historyplus.SearchView.prototype.handleLimitClick = function(e) {
 /**
  * Control collapse image click.
  * @param {object} e Event object.
- * @param {?boolean} opt_collapse Whether .
+ * @param {?boolean} opt_clp Whether this element should be collapsed.
  * @return {boolean} Whether the action end correctly.
  */
-historyplus.SearchView.prototype.handleCollapseClick = function(e, opt_collapse) {
+historyplus.SearchView.prototype.handleCollapseClick = function(e, opt_clp) {
   var button = e.target;
   goog.array.forEach(
     // Select the sibling element.
@@ -874,8 +905,8 @@ historyplus.SearchView.prototype.handleCollapseClick = function(e, opt_collapse)
     function(element) {
       var current = goog.style.isElementShown(element);
       var display = true;
-      if (goog.isBoolean(opt_collapse)) {
-        current = !opt_collapse;
+      if (goog.isBoolean(opt_clp)) {
+        current = !opt_clp;
       }
       if (current) {
         display = false;
@@ -913,8 +944,18 @@ historyplus.SearchView.prototype.handleAllCollapse = function(isColapse) {
  * @return {boolean} Whether the action event end correctly.
  */
 historyplus.SearchView.prototype.handleDeleteHistoryChange = function(e) {
-  console.log(e);
-  if (confirm('Are you sure that all history is deleted?')) {
+  var self = this;
+  var option = e.target;
+  var value = option.getElement().getAttribute('value');
+  if (value == 'all') {
+    if (confirm('Are you sure that all history is deleted?')) {
+      this.showMessage('Removing All History. Please wait ...');
+      //call chrome api
+      //http://code.google.com/chrome/extensions/history.html#method-deleteAll
+      chrome.history.deleteAll(function() {
+        self.controller_.searchHistory();
+      });
+    }
   }
   return true;
 };
