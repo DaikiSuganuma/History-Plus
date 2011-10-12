@@ -326,4 +326,19 @@ header {
           padding-left: 10px;
         }
 
+  #list-result .list-footer {
+    clear: both;
+    margin: 10px 0 50px;
+    padding: 10px 10px;
+  }
+
+  /* Adjust line height by elapsed time */
+  #list-result .elapsed-hour-0 {margin-top:0;}
+  #list-result .elapsed-hour-1 {margin-top:5px;}
+  #list-result .elapsed-hour-2 {margin-top:10px;}
+  #list-result .elapsed-hour-3 {margin-top:15px;}
+  #list-result .elapsed-hour-4 {margin-top:20px;}
+  #list-result .elapsed-hour-5 {margin-top:25px;}
+  #list-result .elapsed-hour-6more {margin-top:30px;}
+  #list-result .todays-first {margin-top:0;}
 

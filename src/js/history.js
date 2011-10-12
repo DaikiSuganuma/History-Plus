@@ -200,7 +200,9 @@ historyplus.SearchModel.prototype.search = function(query) {
   //http://code.google.com/chrome/extensions/history.html#method-search
   chrome.history.search(query, function(results) {
     self.view_.hideMessage();
-    self.saveHistory(results);
+    if (self.saveHistory(results)) {
+      self.view_.handleFinishList();
+    }
   });
   return true;
 };
@@ -211,12 +213,13 @@ historyplus.SearchModel.prototype.search = function(query) {
  * Loop in search results and group by domain.
  * @see http://code.google.com/chrome/extensions/history.html#type-HistoryItem
  * @param {array} itemList List of historyItem.
+ * @return {boolean} Whether the result have item.
  */
 historyplus.SearchModel.prototype.saveHistory = function(itemList) {
   this.queryCount = itemList.length;
   if (itemList.length == 0) {
     this.view_.showMessage('No Search Results');
-    return;
+    return false;
   }
   var domainItem = {};
   domainItem.title = '';
@@ -235,10 +238,14 @@ historyplus.SearchModel.prototype.saveHistory = function(itemList) {
     //because "lastVisitTime" may be updated by latest date.
     var currentDate = new goog.date.DateTime();
     currentDate.setTime(historyItem.lastVisitTime);
-    if (goog.date.Date.compare(preTime, currentDate) < 0) {
+    var time = goog.date.Date.compare(preTime, currentDate); // Elapsed Time
+    if (time < 0) {
       //the lastVisitTime is already updated
       historyItem.lastVisitTimeUpdated = true;
     } else {
+      if (i > 0) {
+        historyItem.elapsedTime = time;
+      }
       preTime.setTime(historyItem.lastVisitTime);
     }
 
@@ -279,6 +286,7 @@ historyplus.SearchModel.prototype.saveHistory = function(itemList) {
       domainItem.list = [];
     }
   }
+  return true;
 };
 
 
@@ -464,16 +472,18 @@ historyplus.SearchView.prototype.initSidebar = function() {
  * Initialize Elements on List Header
  */
 historyplus.SearchView.prototype.initList = function() {
+  var self = this;
+
   // List Header
-  goog.array.forEach(
-    goog.dom.query('#list-header-collapse .goog-toggle-button'),
-    function(element) {
-      var button = goog.ui.decorate(goog.dom.getElement(element));
-      //bind event
-      goog.events.listen(button, goog.ui.Component.EventType.ACTION,
-        function(e) {
-          console.log('list-header-collapse');
-        });
+  var button = goog.ui.decorate(goog.dom.getElement('all-collapse-open'));
+  goog.events.listen(button, goog.ui.Component.EventType.ACTION,
+    function(e) {
+      self.handleAllCollapse(true);
+    });
+  var button = goog.ui.decorate(goog.dom.getElement('all-collapse-close'));
+  goog.events.listen(button, goog.ui.Component.EventType.ACTION,
+    function(e) {
+      self.handleAllCollapse(false);
     });
 };
 
@@ -550,9 +560,14 @@ historyplus.SearchView.prototype.setContentSize = function(sizeWindow) {
 historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
   if (!domainItem.list) return false;
 
+  var self = this;
+
   //Date
   var startDate = this.getStartDate(domainItem);
   var endDate = this.getEndDate(domainItem);
+
+  // Add css class name
+  var addClass = this.getAddClass(domainItem);
 
   //check whether it should show date line.
   if (endDate) {
@@ -569,10 +584,10 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
       var currentDate = this.dateFormatter_.format(this.dateTemp_);
       this.domList_.appendChild(
         goog.dom.createDom('div', 'date', currentDate));
+      addClass += ' todays-first';
     }
   }
-
-  var frameDiv = goog.dom.createDom('div', 'item-frame');
+  var frameDiv = goog.dom.createDom('div', 'item-frame ' + addClass);
 
   //time
   var timeString = '-';
@@ -624,14 +639,7 @@ historyplus.SearchView.prototype.addHistoryRow = function(domainItem, dataNo) {
     //collapse event bind
     var toggleButton = goog.dom.createDom('div', 'hp-icon button-toggle');
     goog.events.listen(toggleButton, goog.events.EventType.CLICK, function(e) {
-      var display = true;
-      if (goog.style.isElementShown(frameChildItem)) {
-        display = false;
-        goog.dom.classes.remove(toggleButton, 'close');
-      } else {
-        goog.dom.classes.add(toggleButton, 'close');
-      }
-      goog.style.showElement(frameChildItem, display);
+      self.handleCollapseClick(e);
     });
     itemDiv.appendChild(toggleButton);
 
@@ -718,6 +726,32 @@ historyplus.SearchView.prototype.getEndDate = function(domainItem) {
 
 
 /**
+ * Parse the elapsed time of list, return the class name
+ * @param {object} domainItem A object that has HistoryItem of same domain.
+ * @return {string} Addtional css class name.
+ */
+historyplus.SearchView.prototype.getAddClass = function(domainItem) {
+  if (!domainItem) return false;
+  if (!domainItem.list) return false;
+  var list = domainItem.list;
+  var name = '';
+  for (var i = 0, item; item = list[i]; i++) {
+    if (item.lastVisitTimeUpdated) continue;
+    if (item.elapsedTime) {
+      var passedHour = parseInt(item.elapsedTime / 60 / 60 / 1000);
+      if (passedHour <= 5) {
+        name = 'elapsed-hour-' + passedHour;
+      } else {
+        name = 'elapsed-hour-6more';
+      }
+    }
+    break;
+  }
+  return name;
+};
+
+
+/**
  * Collect search condition from header menu.
  * @return {object} The object include search condition.
  */
@@ -782,6 +816,17 @@ historyplus.SearchView.prototype.getSeachCondition = function() {
 
 
 /**
+ * This method is called when the list drawing is finished.
+ * @return {boolean} Whether the action end correctly.
+ */
+historyplus.SearchView.prototype.handleFinishList = function() {
+  var dom = goog.dom.createDom('div', 'list-footer', '');
+  this.domList_.appendChild(dom);
+  return true;
+};
+
+
+/**
  * Action Event when Date Rage in header toolbar is changed
  * @param {object} e Event object.
  * @return {boolean} Whether the action event end correctly.
@@ -811,6 +856,53 @@ historyplus.SearchView.prototype.handleLimitClick = function(e) {
 
   //excute search method
   this.controller_.searchHistory();
+  return true;
+};
+
+
+/**
+ * Control collapse image click.
+ * @param {object} e Event object.
+ * @param {?boolean} opt_collapse Whether .
+ * @return {boolean} Whether the action end correctly.
+ */
+historyplus.SearchView.prototype.handleCollapseClick = function(e, opt_collapse) {
+  var button = e.target;
+  goog.array.forEach(
+    // Select the sibling element.
+    goog.dom.query('~ .child-frame', button),
+    function(element) {
+      var current = goog.style.isElementShown(element);
+      var display = true;
+      if (goog.isBoolean(opt_collapse)) {
+        current = !opt_collapse;
+      }
+      if (current) {
+        display = false;
+        goog.dom.classes.remove(button, 'close');
+      } else {
+        goog.dom.classes.add(button, 'close');
+      }
+      goog.style.showElement(element, display);
+    });
+  return true;
+};
+
+
+/**
+ * Control all collapse status of list.
+ * @param {boolean} isColapse If it is true, all item is collapsed.
+ * @return {boolean} Whether the action end correctly.
+ */
+historyplus.SearchView.prototype.handleAllCollapse = function(isColapse) {
+  var self = this;
+  goog.array.forEach(
+    goog.dom.query('#list-result .button-toggle'),
+    function(element) {
+      var e = new goog.events.EventTarget();
+      e.target = element;
+      self.handleCollapseClick(e, isColapse);
+    });
   return true;
 };
 
