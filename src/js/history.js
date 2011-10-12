@@ -70,11 +70,6 @@ goog.require('goog.ui.decorate');
 goog.require('historyplus.ComboBoxControl');
 
 
-/**
- * Base namespace for History Plus.
- * @const
- **/
-var historyplus = historyplus || {};
 
 
 /**

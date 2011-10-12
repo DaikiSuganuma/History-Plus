@@ -16,6 +16,13 @@ goog.require('goog.ui.Control');
 
 
 /**
+ * Base namespace for History Plus.
+ * @const
+ **/
+var historyplus = historyplus || {};
+
+
+/**
  * Extends {@link goog.ui.ComboBox} and {@link goog.ui.Control}
  * @param {goog.ui.ControlContent} content Text caption or DOM structure
  *     to display as the content of the component (if any).
