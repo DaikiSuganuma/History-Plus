@@ -127,6 +127,7 @@ historyplus.SearchController.prototype.startApp = function() {
 
   //excute search method
   this.searchHistory();
+
 };
 
 
@@ -283,6 +284,16 @@ historyplus.SearchModel.prototype.saveHistory = function(itemList) {
     //check whether the next item is same domain
     var isNewLine = true;
     if (i + 1 < itemList.length) {
+    if (historyItem.id == '121577') {
+      var str = '/keyword/%A5%D6%A5%ED%A5%B0';
+      str = str.replace(/\+/g, '%20');
+      console.log(unescape(str));
+      console.log(decodeURIComponent(unescape(str)));
+      var test2 = decodeURIComponent('/keyword/%A5%D6%A5%ED%A5%B0');
+      console.log(itemList[i + 1].url);
+      console.log(goog.Uri.parse(itemList[i + 1].url));
+      console.log(currentUrl.hasSameDomainAs(nextUrl));
+    }
       var nextUrl = goog.Uri.parse(itemList[i + 1].url);
       if (currentUrl.hasSameDomainAs(nextUrl)) {
         isNewLine = false;
@@ -384,14 +395,6 @@ historyplus.SearchView.prototype.init = function() {
     new goog.i18n.DateTimeFormat("yyyy'/'MM'/'dd '(' E ')'");
   this.timeFormatter_ = new goog.i18n.DateTimeFormat("H':'mm");
 
-  // Initiallize the content size
-  this.setContentSize(goog.dom.getViewportSize());
-  // Bind window resize
-  var vsm = new goog.dom.ViewportSizeMonitor();
-  goog.events.listen(vsm, goog.events.EventType.RESIZE, function(e) {
-    self.setContentSize(vsm.getSize());
-  });
-
   // Header init
   this.initHeader();
 
@@ -400,6 +403,21 @@ historyplus.SearchView.prototype.init = function() {
 
   // List init
   this.initList();
+
+  //show content
+  goog.style.showElement(goog.dom.getElement('init-msg'), false);
+  goog.style.showElement(this.domHeader_, true);
+  goog.style.showElement(this.domContent_, true);
+  goog.style.showElement(this.domSidebar_, true);
+
+  // Initiallize the content size
+  this.setContentSize(goog.dom.getViewportSize());
+  // Bind window resize
+  var vsm = new goog.dom.ViewportSizeMonitor();
+  goog.events.listen(vsm, goog.events.EventType.RESIZE, function(e) {
+    self.setContentSize(vsm.getSize());
+  });
+
 };
 
 
@@ -488,15 +506,15 @@ historyplus.SearchView.prototype.initList = function() {
   var self = this;
 
   // List Header
-  var button = goog.ui.decorate(goog.dom.getElement('all-collapse-open'));
+  var button = goog.ui.decorate(goog.dom.getElement('all-expand'));
   goog.events.listen(button, goog.ui.Component.EventType.ACTION,
     function(e) {
-      self.handleAllCollapse(true);
+      self.handleAllExpand(true);
     });
-  var button = goog.ui.decorate(goog.dom.getElement('all-collapse-close'));
+  var button = goog.ui.decorate(goog.dom.getElement('all-collapse'));
   goog.events.listen(button, goog.ui.Component.EventType.ACTION,
     function(e) {
-      self.handleAllCollapse(false);
+      self.handleAllExpand(false);
     });
 };
 
@@ -916,18 +934,18 @@ historyplus.SearchView.prototype.handleCollapseClick = function(e, opt_clp) {
 
 
 /**
- * Control all collapse status of list.
- * @param {boolean} isColapse If it is true, all item is collapsed.
+ * Control all expand/collapse status of list.
+ * @param {boolean} isExpand If it is true, all item is collapsed.
  * @return {boolean} Whether the action end correctly.
  */
-historyplus.SearchView.prototype.handleAllCollapse = function(isColapse) {
+historyplus.SearchView.prototype.handleAllExpand = function(isExpand) {
   var self = this;
   goog.array.forEach(
     goog.dom.query('#list-result .button-toggle'),
     function(element) {
       var e = new goog.events.EventTarget();
       e.target = element;
-      self.handleCollapseClick(e, isColapse);
+      self.handleCollapseClick(e, isExpand);
     });
   return true;
 };

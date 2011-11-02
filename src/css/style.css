@@ -36,11 +36,11 @@ input, select {vertical-align:middle;}
 /*
  * 02. Layout(Width, Height of main frames)
  */
-header {
+#header {
   min-width: 980px;
   height: 30px;
 }
-.content-frame {
+#content-frame {
   min-width: 980px;
 }
 #sidebar {
@@ -137,7 +137,12 @@ header {
 /*
  * 05. Header
  */
-header {
+#init-msg {
+  margin: 10px 20px;
+  font-size: 1.4em;
+  font-weight: bold;
+}
+#header {
   background: #DDDDDD;
   border-bottom: 1px solid #AAAAAA;
 }
@@ -145,7 +150,7 @@ header {
     position: relative;
     padding: 0 20px;
   }
-  header div.hp-icon {
+  #header div.hp-icon {
     margin-right: 5px;
   }
 
@@ -179,7 +184,7 @@ header {
     #text-search-box .goog-combobox-button {
       display: none;
     }
-    header #button-search .goog-custom-button-inner-box {
+    #header #button-search .goog-custom-button-inner-box {
       background: url(../images/icons.png) -38px -0px no-repeat;
       width: 16px;
       height: 16px;
@@ -187,7 +192,7 @@ header {
     }
 
   /* Delete History */
-  header #delete-history {
+  #header #delete-history {
     position: absolute;
     top: 0;
     right: 20px;
@@ -259,7 +264,7 @@ header {
     background: #ddd;
     padding: 0 10px;
   }
-    #list-header-collapse {
+    #list-header-controller {
       margin: 3px 0 0;
     }
     #list-header-message {
@@ -280,6 +285,7 @@ header {
   /* List */
   #list-result {
     border-left: 5px solid #ddd;
+    overflow-x: hidden;
     overflow-y: scroll;
   }
     #list-result .date {
@@ -303,6 +309,7 @@ header {
         position: relative;
         overflow: visible;
         margin-left: 100px;
+        white-space: nowrap;
       }
         #list-result .item .time {
           width: 40px;
@@ -339,11 +346,11 @@ header {
 
   /* Adjust line height by elapsed time */
   #list-result .elapsed-hour-0 {margin-top:0;}
-  #list-result .elapsed-hour-1 {margin-top:5px;}
-  #list-result .elapsed-hour-2 {margin-top:10px;}
-  #list-result .elapsed-hour-3 {margin-top:15px;}
-  #list-result .elapsed-hour-4 {margin-top:20px;}
-  #list-result .elapsed-hour-5 {margin-top:25px;}
-  #list-result .elapsed-hour-6more {margin-top:30px;}
+  #list-result .elapsed-hour-1 {margin-top:10px;}
+  #list-result .elapsed-hour-2 {margin-top:15px;}
+  #list-result .elapsed-hour-3 {margin-top:20px;}
+  #list-result .elapsed-hour-4 {margin-top:25px;}
+  #list-result .elapsed-hour-5 {margin-top:30px;}
+  #list-result .elapsed-hour-6more {margin-top:50px;}
   #list-result .todays-first {margin-top:0;}
 

@@ -17,9 +17,13 @@
   <link rel="stylesheet" type="text/css" href="css/goog/menuseparator.css"/>
   <link rel="stylesheet" type="text/css" href="css/goog/toolbar.css"/>
   <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script type="text/javascript" src="closure-library/closure/goog/base.js"></script>
+  <script type="text/javascript" src="js/deps.js"></script>
 </head>
 <body>
-  <header id="header">
+  <div id="init-msg">Initializing...</div>
+
+  <header id="header" style="display:none;">
 
     <div id="header-toolbar" class="goog-toolbar">
 
@@ -85,8 +89,8 @@
 
   </header>
 
-  <div class="content-frame">
-    <div id="sidebar">
+  <div id="content-frame">
+    <div id="sidebar" style="display:none;">
       <div class="sidebar-calendar-frame">
         <div id="sidebar-calendar"></div>
         <div class="clear"></div>
@@ -109,13 +113,13 @@
       </div>
     </div><!-- /#sidebar -->
 
-    <div id="content">
+    <div id="content" style="display:none;">
       <div id="list-header">
 
-        <div id="list-header-collapse" class="goog-inline-block">
-          <div id="all-collapse-open" title="Collapse All" class="goog-custom-button goog-custom-button-collapse-right">
+        <div id="list-header-controller" class="goog-inline-block">
+          <div id="all-expand" title="Collapse All" class="goog-custom-button goog-custom-button-collapse-right">
             <span class="hp-icon hp-icon-plus goog-inline-block">&nbsp;</span>
-          </div><div id="all-collapse-close"  title="Uncollapse All" class="goog-custom-button goog-custom-button-collapse-left">
+          </div><div id="all-collapse"  title="Uncollapse All" class="goog-custom-button goog-custom-button-collapse-left">
             <span class="hp-icon hp-icon-minus goog-inline-block">&nbsp;</span>
           </div>
         </div>
@@ -124,9 +128,7 @@
           Loading ...
         </div>
 
-        <div id="list-header-result-text" class="goog-inline-block">
-          20 domain, 26 url
-        </div>
+        <div id="list-header-result-text" class="goog-inline-block"></div>
       </div> <!-- /#list-header -->
 
       <div id="list-result">
@@ -135,6 +137,9 @@
     <div clas="clear"></div>
   </div>
 
-<script type="text/javascript" src="js/history.min.js"></script>
+<!--<script type="text/javascript" src="js/history.min.js"></script>-->
+<script type="text/javascript">
+goog.require('historyplus.SearchController');
+</script>
 </body>
 </html>
