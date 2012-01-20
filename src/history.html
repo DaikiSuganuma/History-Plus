@@ -21,73 +21,9 @@
   <script type="text/javascript" src="js/deps.js"></script>
 </head>
 <body>
-  <div id="init-msg">Initializing...</div>
+  <div id="init-msg" style="display:none;">Initializing...</div>
 
-  <header id="header" style="display:none;">
-
-    <div id="header-toolbar" class="goog-toolbar">
-
-      <div class="hp-icon hp-icon-calendar goog-inline-block"></div>
-      <div id="date-range" title="Date Range" class="goog-toolbar-select">
-        <div id="menu-date-range" class="goog-menu">
-          <div class="goog-option" value="today">Today</div>
-          <div class="goog-option" value="yesterday">Yesterday</div>
-          <div class="goog-option" value="last-week">Last Week</div>
-          <div class="goog-option" value="last-month">Last Month</div>
-          <div class="goog-menuseparator"></div>
-          <div class="goog-option" value="all">All</div>
-        </div>
-      </div>
-
-      <div id="date-range-begin" class="goog-toolbar-select goog-toolbar-menu-button-disabled">
-        <div id="menu-date-range-calendar-begin" class="goog-menu">
-          <div class="goog-option" value="">0000/00/00 (Mon)</div>
-        </div>
-      </div>
-      <div class="date-range-separator goog-inline-block">&ndash;</div>
-      <div id="date-range-end" class="goog-toolbar-select goog-toolbar-menu-button-disabled">
-        <div id="menu-date-range-calendar-end" class="goog-menu">
-          <div class="goog-option" value="">9999/99/99 (Sun)</div>
-        </div>
-      </div>
-
-      <hr/>
-
-      <div class="hp-icon hp-icon-limit goog-inline-block"></div>
-      <div id="limit-button-100" value="100" title="100" class="hp-limit-button goog-toolbar-toggle-button goog-toolbar-button-collapse-right">
-        100
-      </div>
-      <div id="limit-button-250" value="250" title="250" class="hp-limit-button goog-toolbar-toggle-button goog-toolbar-button-collapse-left goog-toolbar-button-collapse-right">
-        250
-      </div>
-      <div id="limit-button-500" value="500" title="500" class="hp-limit-button goog-toolbar-toggle-button goog-toolbar-button-collapse-left goog-toolbar-button-collapse-right">
-        500
-      </div>
-      <div id="limit-button-1000" value="1000" title="1000" class="hp-limit-button goog-toolbar-toggle-button goog-toolbar-button-collapse-left">
-        1000
-      </div>
-
-      <hr/>
-
-      <div id="button-search" class="goog-custom-button"></div>
-
-      <hr/>
-
-      <div id="delete-history" title="Delete History" class="goog-toolbar-menu-button">
-        <div>
-          <span class="hp-icon hp-icon-delete goog-inline-block">&nbsp;</span>
-          <span class="hp-insert-caption goog-inline-block">Delete History</span>
-        </div>
-        <div id="menu-delete-history" class="goog-menu">
-          <div class="goog-option goog-menuitem-disabled" value="all">Current Date Range</div>
-          <div class="goog-menuseparator"></div>
-          <div class="goog-option" value="all">All</div>
-        </div>
-      </div>
-
-    </div><!-- /#header-toolbar -->
-
-  </header>
+  <header id="header"></header>
 
   <div id="content-frame">
     <div id="sidebar" style="display:none;">
@@ -139,7 +75,7 @@
 
 <!--<script type="text/javascript" src="js/history.min.js"></script>-->
 <script type="text/javascript">
-goog.require('historyplus.SearchController');
+goog.require('historyplus.AppController');
 </script>
 </body>
 </html>

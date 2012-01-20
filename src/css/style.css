@@ -146,7 +146,7 @@ input, select {vertical-align:middle;}
   background: #DDDDDD;
   border-bottom: 1px solid #AAAAAA;
 }
-  #header-toolbar {
+  #header .goog-toolbar {
     position: relative;
     padding: 0 20px;
   }
