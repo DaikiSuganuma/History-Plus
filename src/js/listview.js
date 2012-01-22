@@ -29,13 +29,11 @@ var historyplus = historyplus || {};
 
 
 /**
- * Functions for drawing the page with HTML.
+ * List Component.
  *
- * Datetime formatting pattern is written in source code, see below:
- * closure/goog/i18n/datetimeformat.js
- *
- * @param {object} App controller App object.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
+ * @extends {goog.ui.Component}
  */
 historyplus.ListView = function(opt_domHelper) {
   goog.base(this, opt_domHelper);

@@ -20,18 +20,15 @@ goog.require('goog.events.EventType');
 goog.require('goog.style');
 goog.require('goog.ui.Control');
 goog.require('goog.ui.Component');
+goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.Option');
 goog.require('goog.ui.Separator');
 goog.require('goog.ui.Toolbar');
-goog.require('goog.ui.ToolbarButton');
 goog.require('goog.ui.ToolbarMenuButton');
 goog.require('goog.ui.ToolbarSelect');
 goog.require('goog.ui.ToolbarSeparator');
 goog.require('goog.ui.ToolbarToggleButton');
 
-goog.require('historyplus.ComboBoxControl');
-goog.require('historyplus.LabelInputControl');
-goog.require('historyplus.LabelInput');
 goog.require('historyplus.ToolbarLabelInput');
 
 
@@ -45,19 +42,18 @@ var historyplus = historyplus || {};
 
 
 /**
- * Functions for drawing the page with HTML.
+ * Header Component.
  *
- * Datetime formatting pattern is written in source code, see below:
- * closure/goog/i18n/datetimeformat.js
- *
- * @param {object} App controller App object.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
+ * @extends {goog.ui.Component}
  */
 historyplus.HeaderView = function(opt_domHelper) {
   goog.base(this, opt_domHelper);
 
-  // List of member variables.
+  // Member Variables.
   this.toolbar_ = null;
+  this.header_ = goog.dom.getElement('header');
 
   // Create a EventHandler 
   this.eventHandler_ = new goog.events.EventHandler(this);
@@ -171,14 +167,44 @@ historyplus.HeaderView.prototype.initialize_ = function() {
   toolbar.addChild(li, true);
 
   // Insert a search button.
-  
+  var button = new goog.ui.CustomButton();
+  button.addClassName('hp-button-search');
+  toolbar.addChild(button, true);
+
   // Insert a separator.
   toolbar.addChild(new goog.ui.ToolbarSeparator(), true);
 
-  // Render toolbar.
-  toolbar.render(goog.dom.getElement('header'));
+  // Insert delete icon.
+  var deleteIcon = new goog.ui.Control();
+  deleteIcon.addClassName('hp-icon hp-icon-delete goog-inline-block');
+  toolbar.addChild(deleteIcon, true);
 
-  //
+  // Insert delete history.
+  var tmb = new goog.ui.ToolbarMenuButton('Delete History');
+  tmb.setId('delete-history');
+  tmb.addClassName('goog-toolbar-select');
+  goog.array.forEach(
+    ['Current Date Range', null, 'All'],
+    function(label, index) {
+      var item = null;
+      if (label) {
+        item = new goog.ui.Option(label);
+        item.setId(label);
+        item.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
+      } else {
+        item = new goog.ui.MenuSeparator();
+      }
+      tmb.addItem(item);
+    });
+  toolbar.addChild(tmb, true);
+
+
+  // Render toolbar.
+  toolbar.render(this.header_);
+
+
+  // Set style for the text input in toolbar,
+  // this must be written after toolbar.render().
   goog.array.forEach(
     goog.dom.query('#header input'),
     function(element) {

@@ -33,7 +33,6 @@ var historyplus = historyplus || {};
  * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper, used for
  *     document interaction.
  * @constructor
- * @extends {goog.ui.LabelInput}
  * @extends {goog.ui.Control}
  */
 historyplus.ToolbarLabelInput = function(label, content, opt_renderer, opt_domHelper) {
@@ -43,6 +42,7 @@ historyplus.ToolbarLabelInput = function(label, content, opt_renderer, opt_domHe
   this.setAllowTextSelection(true);
   this.addChild(this.labelInput_, true);
   this.addClassName(goog.ui.INLINE_BLOCK_CLASSNAME);
+  this.addClassName('hp-toolbar-input');
 };
 goog.inherits(historyplus.ToolbarLabelInput, goog.ui.Control);
 

@@ -169,32 +169,31 @@ input, select {vertical-align:middle;}
     }
 
   /* Search Box */
-  #text-search-box {
-    vertical-align: middle;
+  .hp-toolbar-input input {
+    width: 120px;
+    border-radius: 3px;
+    border: 1px solid #BFCBDF;
+    padding: 3px 4px;
   }
-    #text-search-box.goog-combobox {
-      border: none;
-    }
-    #text-search-box.goog-combobox input {
-      width: 120px;
-      border-radius: 3px;
-      border: 1px solid #BFCBDF;
-      padding: 3px 4px;
-    }
-    #text-search-box .goog-combobox-button {
-      display: none;
-    }
-    #header #button-search .goog-custom-button-inner-box {
-      background: url(../images/icons.png) -38px -0px no-repeat;
+  .hp-button-search {
+    background: #DDD url(../images/bg_button.png) repeat-x top left;
+  }
+    .hp-button-search .goog-custom-button-inner-box {
+      background: url(../images/icons.png) -39px -0px no-repeat;
+      padding: 3px;
       width: 16px;
       height: 16px;
-      background-repeat: no-repeat;
     }
 
   /* Delete History */
-  #header #delete-history {
+  #header .hp-icon-delete {
     position: absolute;
-    top: 0;
+    top: 7px;
+    right: 126px;
+  }
+  #delete-history {
+    position: absolute;
+    top: 2px;
     right: 20px;
   }
 
@@ -211,14 +210,11 @@ input, select {vertical-align:middle;}
   padding: 0;
 }
   /* Sidebar Calendar */
-  #sidebar .sidebar-calendar-frame {
-    margin: 10px auto;
-  }
-  #sidebar-calendar {}
-    #sidebar-calendar .goog-date-picker {
+    #sidebar .goog-date-picker {
+      margin: 10px auto;
       float: none;
     }
-    #sidebar-calendar .goog-date-picker table {
+    #sidebar .goog-date-picker table {
       width: 100%;
     }
 

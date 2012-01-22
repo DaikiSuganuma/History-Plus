@@ -101,8 +101,8 @@ historyplus.AppController.prototype.initialize_ = function() {
 
   // Create view objects.
   this.headerView_ = new historyplus.HeaderView();
+  this.sidebarView_ = new historyplus.SidebarView();
   return;
-  //this.sidebarView_ = new historyplus.SidebarView();
   //this.listView_ = new historyplus.ListView();
 
   // Bind event for resizing window.
