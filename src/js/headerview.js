@@ -53,39 +53,81 @@ historyplus.HeaderView = function(opt_domHelper) {
 
   // Member Variables.
   this.toolbar_ = null;
-  this.header_ = goog.dom.getElement('header');
 
-  // Create a EventHandler 
-  this.eventHandler_ = new goog.events.EventHandler(this);
-
-  this.initialize_();
+  // Add child component under Toolbar component.
+  this.initialize_(opt_domHelper);
 };
 goog.inherits(historyplus.HeaderView, goog.ui.Component);
 
 
 /**
+ * CSS class names for HeaderView outer container.
+ * @type {string}
+ * @private
+ */
+historyplus.HeaderView.CLASS_NAME_ = goog.getCssName('header-toolbar');
+
+
+/** @override */
+historyplus.HeaderView.prototype.disposeInternal = function() {
+  goog.base(this, 'disposeInternal');
+};
+
+
+/** @override */
+historyplus.HeaderView.prototype.createDom = function() {
+  var dom = this.getDomHelper();
+  this.toolbar_.createDom();
+  this.setElementInternal(dom.createDom(
+    'div',
+    historyplus.HeaderView.CLASS_NAME_,
+    this.toolbar_.getElement()));
+
+  //
+  this.toolbar_.forEachChild(function(comp) {
+    comp.createDom();
+    this.toolbar_.getContentElement().appendChild(comp.getElement());
+  }, this);
+
+  console.log(this.element_);
+};
+
+
+/** @override */
+historyplus.HeaderView.prototype.enterDocument = function() {
+  goog.base(this, 'enterDocument');
+};
+
+
+/** @override */
+historyplus.HeaderView.prototype.exitDocument = function() {
+  goog.base(this, 'exitDocument');
+};
+
+
+/**
  * Initialize components.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @return {boolean} Whether this method have completed successfully.
  * @private
  */
-historyplus.HeaderView.prototype.initialize_ = function() {
-  var self = this;
-  var eventHandler = null;
-  eventHandler = this.eventHandler_;
+historyplus.HeaderView.prototype.initialize_ = function(opt_domHelper) {
 
   // Generate Toolbar component.
-  var toolbar = null;
-  this.toolbar_ = new goog.ui.Toolbar();
-  toolbar = this.toolbar_;
-  toolbar.setId('header-toolbar');
+  this.toolbar_ = new goog.ui.Toolbar(
+    goog.ui.ToolbarRenderer.getInstance(),
+    goog.ui.Container.Orientation.HORIZONTAL,
+    opt_domHelper);
+  this.toolbar_.setId('header-toolbar');
+  this.addChild(this.toolbar_);
 
   // Insert calendar icon.
-  var calIcon = new goog.ui.Control();
+  var calIcon = new goog.ui.Control(null, null, opt_domHelper);
   calIcon.addClassName('hp-icon hp-icon-calendar goog-inline-block');
-  toolbar.addChild(calIcon, true);
+  this.toolbar_.addChild(calIcon);
 
   // Insert date range menu.
-  var ts = new goog.ui.ToolbarSelect();
+  var ts = new goog.ui.ToolbarSelect(null, null, null, opt_domHelper);
   var selectedIndex = null;
   ts.setId('date-range');
   ts.addClassName('goog-toolbar-select');
@@ -94,93 +136,89 @@ historyplus.HeaderView.prototype.initialize_ = function() {
     function(label, index) {
       var item = null;
       if (label) {
-        item = new goog.ui.Option(label);
+        item = new goog.ui.Option(label, null, opt_domHelper);
         item.setId(label);
         item.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
         if (label == 'All') {
           selectedIndex = index;
         }
       } else {
-        item = new goog.ui.MenuSeparator();
+        item = new goog.ui.MenuSeparator(opt_domHelper);
       }
       ts.addItem(item);
     });
-  toolbar.addChild(ts, true);
+  this.toolbar_.addChild(ts);
   ts.setSelectedIndex(selectedIndex);
 
   // Insert date range begin menu.
-  var tsb = new goog.ui.ToolbarSelect();
+  var tsb = new goog.ui.ToolbarSelect(null, null, null, opt_domHelper);
   tsb.setId('date-range-begin');
   tsb.addClassName('goog-toolbar-select');
-  var item = new goog.ui.Option('0000/00/00 (Mon)');
+  var item = new goog.ui.Option('0000/00/00 (Mon)', null, opt_domHelper);
   item.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
   tsb.addItem(item);
-  toolbar.addChild(tsb, true);
+  this.toolbar_.addChild(tsb);
   tsb.setSelectedItem(item);
   tsb.setEnabled(false);
 
   // Insert dash icon.
-  var dashIcon = new goog.ui.Control('-');
+  var dashIcon = new goog.ui.Control('-', null, opt_domHelper);
   dashIcon.addClassName('date-range-separator goog-inline-block');
-  toolbar.addChild(dashIcon, true);
+  this.toolbar_.addChild(dashIcon);
 
   // Insert date range end menu.
-  var tse = new goog.ui.ToolbarSelect();
+  var tse = new goog.ui.ToolbarSelect(null, null, null, opt_domHelper);
   tse.setId('date-range-end');
   tse.addClassName('goog-toolbar-select');
-  var item = new goog.ui.Option('9999/99/99 (Sun)');
+  var item = new goog.ui.Option('9999/99/99 (Sun)', null, opt_domHelper);
   item.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
   tse.addItem(item);
-  toolbar.addChild(tse, true);
+  this.toolbar_.addChild(tse);
   tse.setSelectedItem(item);
   tse.setEnabled(false);
 
   // Insert a separator.
-  toolbar.addChild(new goog.ui.ToolbarSeparator(), true);
+  this.toolbar_.addChild(new goog.ui.ToolbarSeparator(null, opt_domHelper));
 
   // Insert limit icon.
-  var limitIcon = new goog.ui.Control();
+  var limitIcon = new goog.ui.Control(null, null, opt_domHelper);
   limitIcon.addClassName('hp-icon hp-icon-limit goog-inline-block');
-  toolbar.addChild(limitIcon, true);
+  this.toolbar_.addChild(limitIcon);
 
   // Insert Limit buttons.
   goog.array.forEach(['100', '250', '500', '1000'], function(value, index) {
-    var button = new goog.ui.ToolbarToggleButton(value);
+    var button = new goog.ui.ToolbarToggleButton(value, null, opt_domHelper);
     button.addClassName('hp-limit-button');
     button.setValue(value);
     button.setId();
-    toolbar.addChild(button, true);
+    this.toolbar_.addChild(button);
     if (index == 0) {
       button.setChecked(true);
     }
-    // Set EventHandler to handle click event.
-    eventHandler.listen(button,
-                        goog.ui.Component.EventType.ACTION,
-                        self.onLimitClick_);
-  });
+  }, this);
 
   // Insert a separator.
-  toolbar.addChild(new goog.ui.ToolbarSeparator(), true);
+  this.toolbar_.addChild(new goog.ui.ToolbarSeparator(null, opt_domHelper));
 
   // Insert a input box by using historyplus.ComboBoxControl
-  var li = new historyplus.ToolbarLabelInput('Filter by keyword');
-  toolbar.addChild(li, true);
+  var li = new historyplus.ToolbarLabelInput('Filter by keyword', null, null, opt_domHelper);
+  this.toolbar_.addChild(li);
 
   // Insert a search button.
-  var button = new goog.ui.CustomButton();
+  var button = new goog.ui.CustomButton(null, null, opt_domHelper);
   button.addClassName('hp-button-search');
-  toolbar.addChild(button, true);
+  this.toolbar_.addChild(button);
 
   // Insert a separator.
-  toolbar.addChild(new goog.ui.ToolbarSeparator(), true);
+  this.toolbar_.addChild(new goog.ui.ToolbarSeparator(null, opt_domHelper));
 
   // Insert delete icon.
-  var deleteIcon = new goog.ui.Control();
+  var deleteIcon = new goog.ui.Control(null, null, opt_domHelper);
   deleteIcon.addClassName('hp-icon hp-icon-delete goog-inline-block');
-  toolbar.addChild(deleteIcon, true);
+  this.toolbar_.addChild(deleteIcon);
 
   // Insert delete history.
-  var tmb = new goog.ui.ToolbarMenuButton('Delete History');
+  var tmb = new goog.ui.ToolbarMenuButton('Delete History', null, null, opt_domHelper);
   tmb.setId('delete-history');
   tmb.addClassName('goog-toolbar-select');
   goog.array.forEach(
@@ -188,31 +226,36 @@ historyplus.HeaderView.prototype.initialize_ = function() {
     function(label, index) {
       var item = null;
       if (label) {
-        item = new goog.ui.Option(label);
+        item = new goog.ui.Option(label, null, opt_domHelper);
         item.setId(label);
         item.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
       } else {
-        item = new goog.ui.MenuSeparator();
+        item = new goog.ui.MenuSeparator(opt_domHelper);
       }
       tmb.addItem(item);
     });
-  toolbar.addChild(tmb, true);
+  this.toolbar_.addChild(tmb);
 
 
   // Render toolbar.
-  toolbar.render(this.header_);
+  //toolbar.render(this.header_);
 
 
   // Set style for the text input in toolbar,
   // this must be written after toolbar.render().
+  /*
   goog.array.forEach(
     goog.dom.query('#header input'),
     function(element) {
       goog.style.setStyle(element, '-webkit-user-select', 'auto');
     });
+    */
 
   return true;
 };
+
+
+
 
 
 /**

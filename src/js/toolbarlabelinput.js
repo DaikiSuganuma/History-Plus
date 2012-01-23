@@ -40,16 +40,38 @@ historyplus.ToolbarLabelInput = function(label, content, opt_renderer, opt_domHe
 
   this.labelInput_ = new goog.ui.LabelInput(label);
   this.setAllowTextSelection(true);
-  this.addChild(this.labelInput_, true);
-  this.addClassName(goog.ui.INLINE_BLOCK_CLASSNAME);
-  this.addClassName('hp-toolbar-input');
+  this.addChild(this.labelInput_);
 };
 goog.inherits(historyplus.ToolbarLabelInput, goog.ui.Control);
 
 
-historyplus.ToolbarLabelInput.prototype.handleMouseUp = function(e) {
-  goog.base(this, 'handleMouseUp', e);
-  this.setFocused(true);
-  this.labelInput_.focusAndSelect();
-  console.log(e);
+/**
+ * CSS class names for ToolbarLabelInput.
+ * @type {string}
+ * @private
+ */
+historyplus.ToolbarLabelInput.CLASS_NAME_ = goog.getCssName('hp-toolbar-input');
+
+
+/** @override */
+historyplus.ToolbarLabelInput.prototype.createDom = function() {
+  var dom = this.getDomHelper();
+  this.labelInput_.createDom();
+
+  this.setElementInternal(dom.createDom(
+    'div',
+    historyplus.ToolbarLabelInput.CLASS_NAME_,
+    this.labelInput_.getElement()));
+
+  // Add CSS class name for inline block.
+  this.addClassName(goog.ui.INLINE_BLOCK_CLASSNAME);
 };
+
+
+/** @override */
+historyplus.ToolbarLabelInput.prototype.enterDocument = function() {
+  goog.base(this, 'enterDocument');
+};
+
+
+
