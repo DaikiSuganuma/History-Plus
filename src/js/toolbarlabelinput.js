@@ -63,7 +63,7 @@ historyplus.ToolbarLabelInput.EventType = {
   /**
    * Dispatched after enter key in the text box.
    */
-  ENTER: 'enter'
+  ENTER: 'historyplus-enter'
 };
 
 

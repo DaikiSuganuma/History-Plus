@@ -189,10 +189,12 @@ historyplus.HeaderView.prototype.initialize_ = function(opt_domHelper) {
   // Insert a input box by using historyplus.ComboBoxControl
   var li = new historyplus.ToolbarLabelInput('Filter by keyword',
                                              null, null, opt_domHelper);
+  li.setId('filterkeyword');
   this.toolbar_.addChild(li);
 
   // Insert a search button.
   var button = new goog.ui.CustomButton(null, null, opt_domHelper);
+  button.setId('filterkeyword-button');
   button.addClassName('hp-button-search');
   this.toolbar_.addChild(button);
 
@@ -271,15 +273,14 @@ historyplus.HeaderView.prototype.enterDocument = function() {
     this.toolbar_,
     goog.ui.Component.EventType.ACTION,
     this.onAction_);
-};
 
-
-/**
- * Collect search condition from header menu.
- * @return {object} The object include search condition.
- */
-historyplus.HeaderView.prototype.getSearchCondition = function() {
-  return false;
+  // Set for Enter event in filter keyword box.
+  var elem = this.toolbar_.getChild('filterkeyword');
+  handler.listen(
+    elem,
+    historyplus.ToolbarLabelInput.EventType.ENTER,
+    this.onFilterKeywordEnter_
+    );
 };
 
 
@@ -298,7 +299,12 @@ historyplus.HeaderView.prototype.onAction_ = function(e) {
       id == 'limit-500' ||
       id == 'limit-1000') {
     this.onLimitClick_(e);
+  } else if (id == 'data-range') {
+    this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
+  } else if (id == 'filterkeyword-button') {
+    this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
   }
+
   return true;
 };
 
@@ -335,10 +341,19 @@ historyplus.HeaderView.prototype.onLimitClick_ = function(e) {
  * @return {boolean} Whether the click event end correctly.
  * @private
  */
-historyplus.HeaderView.prototype.onFilterKeywordKeyUp_ = function(e) {
-  if (e.keyCode == goog.events.KeyCodes.ENTER) {
-    console.log('Excute search method');
-    this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
-  }
+historyplus.HeaderView.prototype.onFilterKeywordEnter_ = function(e) {
+  this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
   return true;
 };
+
+
+/**
+ * Collect search condition from header menu.
+ * @return {object} The object include search condition.
+ */
+historyplus.HeaderView.prototype.getSearchCondition = function() {
+  console.log('getSearchCondition');
+  return false;
+};
+
+
