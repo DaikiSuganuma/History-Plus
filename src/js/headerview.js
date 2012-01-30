@@ -1,4 +1,4 @@
-// Copyright (c) 2011 History Plus Authors. All rights reserved.
+// Copyright (c) 2012 History Plus Authors. All rights reserved.
 //
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
@@ -68,40 +68,15 @@ goog.inherits(historyplus.HeaderView, goog.ui.Component);
 historyplus.HeaderView.CLASS_NAME_ = goog.getCssName('header-toolbar');
 
 
-/** @override */
-historyplus.HeaderView.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
-};
-
-
-/** @override */
-historyplus.HeaderView.prototype.createDom = function() {
-  var dom = this.getDomHelper();
-  this.toolbar_.createDom();
-  this.setElementInternal(dom.createDom(
-    'div',
-    historyplus.HeaderView.CLASS_NAME_,
-    this.toolbar_.getElement()));
-
-  //
-  this.toolbar_.forEachChild(function(comp) {
-    comp.createDom();
-    this.toolbar_.getContentElement().appendChild(comp.getElement());
-  }, this);
-
-  console.log(this.element_);
-};
-
-
-/** @override */
-historyplus.HeaderView.prototype.enterDocument = function() {
-  goog.base(this, 'enterDocument');
-};
-
-
-/** @override */
-historyplus.HeaderView.prototype.exitDocument = function() {
-  goog.base(this, 'exitDocument');
+/**
+ * Events.
+ * @enum {string}
+ */
+historyplus.HeaderView.EventType = {
+  /**
+   * Dispatched after the value in Toolbar is changed.
+   */
+  CHANGE_CONDITION: 'change_condition'
 };
 
 
@@ -131,15 +106,21 @@ historyplus.HeaderView.prototype.initialize_ = function(opt_domHelper) {
   var selectedIndex = null;
   ts.setId('date-range');
   ts.addClassName('goog-toolbar-select');
-  goog.array.forEach(
-    ['Today', 'Yesterday', 'Last Week', 'Last Month', null, 'All'],
-    function(label, index) {
+  var dateRange = [
+    ['daterange-today', 'Taday'],
+    ['daterange-yesterday', 'Yesterday'],
+    ['daterange-last-week', 'Last Week'],
+    ['daterange-last-month', 'Last Month'],
+    null,
+    ['daterange-all', 'All']];
+  goog.array.forEach(dateRange,
+    function(data, index) {
       var item = null;
-      if (label) {
-        item = new goog.ui.Option(label, null, opt_domHelper);
-        item.setId(label);
+      if (data) {
+        item = new goog.ui.Option(data[1], null, opt_domHelper);
+        item.setId(data[0]);
         item.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
-        if (label == 'All') {
+        if (data[0] == 'daterange-all') {
           selectedIndex = index;
         }
       } else {
@@ -186,11 +167,16 @@ historyplus.HeaderView.prototype.initialize_ = function(opt_domHelper) {
   this.toolbar_.addChild(limitIcon);
 
   // Insert Limit buttons.
-  goog.array.forEach(['100', '250', '500', '1000'], function(value, index) {
-    var button = new goog.ui.ToolbarToggleButton(value, null, opt_domHelper);
+  var limitValues = [
+    ['limit-100', '100'],
+    ['limit-250', '250'],
+    ['limit-500', '500'],
+    ['limit-1000', '1000']];
+  goog.array.forEach(limitValues, function(data, index) {
+    var button = new goog.ui.ToolbarToggleButton(data[1], null, opt_domHelper);
     button.addClassName('hp-limit-button');
-    button.setValue(value);
-    button.setId();
+    button.setValue(data[1]);
+    button.setId(data[0]);
     this.toolbar_.addChild(button);
     if (index == 0) {
       button.setChecked(true);
@@ -201,7 +187,8 @@ historyplus.HeaderView.prototype.initialize_ = function(opt_domHelper) {
   this.toolbar_.addChild(new goog.ui.ToolbarSeparator(null, opt_domHelper));
 
   // Insert a input box by using historyplus.ComboBoxControl
-  var li = new historyplus.ToolbarLabelInput('Filter by keyword', null, null, opt_domHelper);
+  var li = new historyplus.ToolbarLabelInput('Filter by keyword',
+                                             null, null, opt_domHelper);
   this.toolbar_.addChild(li);
 
   // Insert a search button.
@@ -218,17 +205,25 @@ historyplus.HeaderView.prototype.initialize_ = function(opt_domHelper) {
   this.toolbar_.addChild(deleteIcon);
 
   // Insert delete history.
-  var tmb = new goog.ui.ToolbarMenuButton('Delete History', null, null, opt_domHelper);
+  var tmb = new goog.ui.ToolbarMenuButton('Delete History',
+                                          null, null, opt_domHelper);
   tmb.setId('delete-history');
   tmb.addClassName('goog-toolbar-select');
-  goog.array.forEach(
-    ['Current Date Range', null, 'All'],
-    function(label, index) {
+  var deleteHistory = [
+    ['delete-current', 'Current Date Range'],
+    null,
+    ['delete-all', 'All']];
+  goog.array.forEach(deleteHistory,
+    function(data, index) {
       var item = null;
-      if (label) {
-        item = new goog.ui.Option(label, null, opt_domHelper);
-        item.setId(label);
+      if (data) {
+        item = new goog.ui.Option(data[1], null, opt_domHelper);
+        item.setId(data[0]);
         item.setDispatchTransitionEvents(goog.ui.Component.State.ALL, true);
+        // TODO: Develop after Calendar feature enabled.
+        if (data[0] == 'delete-current') {
+          item.setEnabled(false);
+        }
       } else {
         item = new goog.ui.MenuSeparator(opt_domHelper);
       }
@@ -236,26 +231,47 @@ historyplus.HeaderView.prototype.initialize_ = function(opt_domHelper) {
     });
   this.toolbar_.addChild(tmb);
 
-
-  // Render toolbar.
-  //toolbar.render(this.header_);
-
-
-  // Set style for the text input in toolbar,
-  // this must be written after toolbar.render().
-  /*
-  goog.array.forEach(
-    goog.dom.query('#header input'),
-    function(element) {
-      goog.style.setStyle(element, '-webkit-user-select', 'auto');
-    });
-    */
-
   return true;
 };
 
 
+/** @override */
+historyplus.HeaderView.prototype.createDom = function() {
+  var dom = this.getDomHelper();
+  this.toolbar_.createDom();
+  // Insert HTML to this.element_.
+  this.setElementInternal(dom.createDom(
+    'div',
+    historyplus.HeaderView.CLASS_NAME_,
+    this.toolbar_.getElement()));
 
+  // Excute createDom method for child component under Toolbar component.
+  this.toolbar_.forEachChild(function(comp) {
+    comp.createDom();
+    // Insert HTML to Toolbar content.
+    this.toolbar_.getContentElement().appendChild(comp.getElement());
+  }, this);
+};
+
+
+/** @override */
+historyplus.HeaderView.prototype.enterDocument = function() {
+  goog.base(this, 'enterDocument');
+
+  // Set style for the text input in Toolbar.
+  goog.array.forEach(
+    this.getElementsByClass('label-input-label'),
+    function(element) {
+      goog.style.setStyle(element, '-webkit-user-select', 'auto');
+    });
+
+  // Set Event Handlers.
+  var handler = this.getHandler();
+  handler.listen(
+    this.toolbar_,
+    goog.ui.Component.EventType.ACTION,
+    this.onAction_);
+};
 
 
 /**
@@ -268,24 +284,47 @@ historyplus.HeaderView.prototype.getSearchCondition = function() {
 
 
 /**
+ * Control all Action Event when toolbar is clicked.
+ * @param {object} e Event object.
+ * @return {boolean} Whether the click event end correctly.
+ * @private
+ */
+historyplus.HeaderView.prototype.onAction_ = function(e) {
+  var id = e.target.getId();
+  if (!id) return false;
+
+  if (id == 'limit-100' ||
+      id == 'limit-250' ||
+      id == 'limit-500' ||
+      id == 'limit-1000') {
+    this.onLimitClick_(e);
+  }
+  return true;
+};
+
+
+/**
  * Action Event when limit bottun is clicked
  * @param {object} e Event object.
  * @return {boolean} Whether the click event end correctly.
  * @private
  */
 historyplus.HeaderView.prototype.onLimitClick_ = function(e) {
+  var id = e.target.getId();
+  if (!id) return false;
+
   // Reset limit buttons.
-  var toolbar = this.toolbar_;
   goog.array.forEach(
-    goog.dom.query('#header .hp-limit-button'),
+    this.getElementsByClass('hp-limit-button'),
     function(element) {
-      var button = toolbar.getChild(element.id);
+      var button = this.toolbar_.getChild(element.id);
       button.setChecked(false);
-    });
+    }, this);
   // Check the click button.
   e.target.setChecked(true);
 
-  console.log('Excute search method');
+  this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
+
   return true;
 };
 
@@ -299,6 +338,7 @@ historyplus.HeaderView.prototype.onLimitClick_ = function(e) {
 historyplus.HeaderView.prototype.onFilterKeywordKeyUp_ = function(e) {
   if (e.keyCode == goog.events.KeyCodes.ENTER) {
     console.log('Excute search method');
+    this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
   }
   return true;
 };

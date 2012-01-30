@@ -44,7 +44,9 @@ goog.require('goog.ui.ToolbarToggleButton');
   <script src="headerview.js"></script>
 </head>
 <body>
-  <div id="sandbox"></div>
+  <div id="header">
+    <div id="sandbox"></div>
+  </div>
   <script>
     var headerview;
     var sandbox = goog.dom.getElement('sandbox');
@@ -67,6 +69,7 @@ goog.require('goog.ui.ToolbarToggleButton');
     function testRender() {
       headerview.render(sandbox);
     }
+
   </script>
 </body>
 </html>
