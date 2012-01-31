@@ -37,38 +37,63 @@ historyplus.SidebarView = function(opt_domHelper) {
 
   // Member Variables.
   this.calendar_ = null;
-  this.sidebar_ = goog.dom.getElement('sidebar');
 
-  // Create a EventHandler 
-  this.eventHandler_ = new goog.events.EventHandler(this);
-
-  this.initialize_();
+  this.initialize_(opt_domHelper);
 };
 goog.inherits(historyplus.SidebarView, goog.ui.Component);
 
 
 /**
+ * CSS class names for ToolbarLabelInput.
+ * @type {string}
+ * @private
+ */
+historyplus.SidebarView.CLASS_NAME_ = goog.getCssName('hp-sidebar');
+
+
+/**
  * Initialize components.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @return {boolean} Whether this method have completed successfully.
  */
-historyplus.SidebarView.prototype.initialize_ = function() {
+historyplus.SidebarView.prototype.initialize_ = function(opt_domHelper) {
 
-  // Generate Calendar
-  var calendar = null;
+  // Generate Calendar component.
   this.calendar_ = new goog.ui.DatePicker();
-  calendar = this.calendar_;
-  //calendar.setId('sidebar-calendar');
+  this.calendar_.setId('sidebar-calendar');
 
-  calendar.setShowWeekNum(false);
-  calendar.setShowToday(false);
-  calendar.setUseNarrowWeekdayNames(true);
-  calendar.setAllowNone(false);
-  calendar.setUseSimpleNavigationMenu(true);
-  calendar.render(this.sidebar_);
+  this.calendar_.setShowWeekNum(false);
+  this.calendar_.setShowToday(false);
+  this.calendar_.setUseNarrowWeekdayNames(true);
+  this.calendar_.setAllowNone(false);
+  this.calendar_.setUseSimpleNavigationMenu(true);
 
-  // Insert a separator
-
+  this.addChild(this.calendar_);
 
   return true;
 };
+
+
+/** @override */
+historyplus.SidebarView.prototype.createDom = function() {
+  var dom = this.getDomHelper();
+  this.calendar_.createDom();
+  // Insert HTML to this.element_.
+  this.setElementInternal(dom.createDom(
+    'div', historyplus.SidebarView.CLASS_NAME_,
+    dom.createDom(
+      'div', 'hp-calendar',
+      this.calendar_.getElement()),
+    dom.createDom('div', 'hp-sidebar-separator'),
+    dom.createDom('div', 'hp-sidebar-widget'),
+    dom.createDom('div', 'hp-sidebar-separator'),
+    dom.createDom('div', 'hp-sidebar-widget')));
+};
+
+
+/** @override */
+historyplus.SidebarView.prototype.enterDocument = function() {
+  goog.base(this, 'enterDocument');
+};
+
 

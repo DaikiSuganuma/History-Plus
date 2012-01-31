@@ -76,7 +76,7 @@ historyplus.HeaderView.EventType = {
   /**
    * Dispatched after the value in Toolbar is changed.
    */
-  CHANGE_CONDITION: 'change_condition'
+  CHANGE_CONDITION: 'historyplus_change_condition'
 };
 
 

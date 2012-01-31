@@ -18,6 +18,8 @@ goog.require('goog.ui.LabelInput');
 goog.require('goog.ui.Control');
 
 
+
+
 /**
  * Base namespace for History Plus.
  * @const
@@ -63,7 +65,7 @@ historyplus.ToolbarLabelInput.EventType = {
   /**
    * Dispatched after enter key in the text box.
    */
-  ENTER: 'historyplus-enter'
+  ENTER: 'historyplus_enter'
 };
 
 
