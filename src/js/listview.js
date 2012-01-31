@@ -13,7 +13,9 @@ goog.provide('historyplus.ListView');
 
 
 goog.require('goog.ui.Component');
-goog.require('goog.ui.ToggleButton');
+goog.require('goog.ui.Control');
+goog.require('goog.ui.CustomButton');
+goog.require('goog.ui.INLINE_BLOCK_CLASSNAME');
 
 
 
@@ -34,6 +36,11 @@ var historyplus = historyplus || {};
  */
 historyplus.ListView = function(opt_domHelper) {
   goog.base(this, opt_domHelper);
+
+  // Member Variables.
+  this.header_ = null;
+  this.list_ = null;
+
   this.initialize_(opt_domHelper);
 };
 goog.inherits(historyplus.ListView, goog.ui.Component);
@@ -55,6 +62,43 @@ historyplus.ListView.CLASS_NAME_ = goog.getCssName('hp-list');
  */
 historyplus.ListView.prototype.initialize_ = function(opt_domHelper) {
   // Add list header.
+  this.header_ = new goog.ui.Component(opt_domHelper);
+  this.addChild(this.header_);
+
+  // Add toggle collapse button.
+  var plusButton = new goog.ui.CustomButton(
+    goog.dom.createDom('div', 'hp-icon hp-icon-plus ' +
+                       goog.ui.INLINE_BLOCK_CLASSNAME),
+    null, opt_domHelper);
+  plusButton.addClassName('goog-custom-button-collapse-right');
+  plusButton.setId('collapse');
+  this.header_.addChild(plusButton);
+
+  var minusButton = new goog.ui.CustomButton(
+    goog.dom.createDom('div', 'hp-icon hp-icon-minus ' +
+                       goog.ui.INLINE_BLOCK_CLASSNAME),
+    null, opt_domHelper);
+  minusButton.addClassName('goog-custom-button-collapse-left');
+  minusButton.setId('uncollapse');
+  this.header_.addChild(minusButton);
+
+  // Add control for message area.
+  var msg = new goog.ui.Control('Loading ...', null, opt_domHelper);
+  msg.addClassName(goog.ui.INLINE_BLOCK_CLASSNAME);
+  msg.setId('message');
+  this.header_.addChild(msg);
+
+  // Add control for result text.
+  var res = new goog.ui.Control('20 domain, 26 url', null, opt_domHelper);
+  res.addClassName(goog.ui.INLINE_BLOCK_CLASSNAME);
+  res.setId('result');
+  this.header_.addChild(res);
+
+
+  // Add list result.
+  this.list_ = new goog.ui.Component(opt_domHelper);
+  this.addChild(this.list_);
+
   return true;
 };
 
@@ -62,11 +106,21 @@ historyplus.ListView.prototype.initialize_ = function(opt_domHelper) {
 /** @override */
 historyplus.ListView.prototype.createDom = function() {
   var dom = this.getDomHelper();
+  this.header_.createDom();
+  this.list_.createDom();
+
   // Insert HTML to this.element_.
   this.setElementInternal(dom.createDom(
     'div', historyplus.ListView.CLASS_NAME_,
-    dom.createDom('div', 'hp-list-header'),
-    dom.createDom('div', 'hp-list-result')));
+    dom.createDom('div', 'hp-list-header', this.header_.getElement()),
+    dom.createDom('div', 'hp-list-result', this.list_.getElement())));
+
+  // Excute createDom method for child component under header component.
+  this.header_.forEachChild(function(child) {
+    child.createDom();
+    this.header_.getContentElement().appendChild(child.getElement());
+  }, this);
+
 };
 
 

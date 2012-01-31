@@ -248,10 +248,10 @@ historyplus.HeaderView.prototype.createDom = function() {
     this.toolbar_.getElement()));
 
   // Excute createDom method for child component under Toolbar component.
-  this.toolbar_.forEachChild(function(comp) {
-    comp.createDom();
+  this.toolbar_.forEachChild(function(child) {
+    child.createDom();
     // Insert HTML to Toolbar content.
-    this.toolbar_.getContentElement().appendChild(comp.getElement());
+    this.toolbar_.getContentElement().appendChild(child.getElement());
   }, this);
 };
 
