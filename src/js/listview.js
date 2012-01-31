@@ -1,4 +1,4 @@
-// Copyright (c) 2011 History Plus Authors. All rights reserved.
+// Copyright (c) 2012 History Plus Authors. All rights reserved.
 //
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
@@ -13,10 +13,7 @@ goog.provide('historyplus.ListView');
 
 
 goog.require('goog.ui.Component');
-goog.require('goog.ui.Control');
-goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.ToggleButton');
-goog.require('goog.ui.decorate');
 
 
 
@@ -37,35 +34,44 @@ var historyplus = historyplus || {};
  */
 historyplus.ListView = function(opt_domHelper) {
   goog.base(this, opt_domHelper);
-  this.initialize_();
+  this.initialize_(opt_domHelper);
 };
 goog.inherits(historyplus.ListView, goog.ui.Component);
 
 
 /**
+ * CSS class names for ToolbarLabelInput.
+ * @type {string}
+ * @private
+ */
+historyplus.ListView.CLASS_NAME_ = goog.getCssName('hp-list');
+
+
+/**
  * Initialize components.
+ * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @return {boolean} Whether this method have completed successfully.
+ * @private
  */
-historyplus.ListView.prototype.initialize_ = function() {
+historyplus.ListView.prototype.initialize_ = function(opt_domHelper) {
+  // Add list header.
   return true;
 };
 
 
-/**
- * Called before search method excute.
- * @return {boolean} Whether this method have completed successfully.
- */
-historyplus.ListView.prototype.onBeginDrowList = function() {
-  return true;
+/** @override */
+historyplus.ListView.prototype.createDom = function() {
+  var dom = this.getDomHelper();
+  // Insert HTML to this.element_.
+  this.setElementInternal(dom.createDom(
+    'div', historyplus.ListView.CLASS_NAME_,
+    dom.createDom('div', 'hp-list-header'),
+    dom.createDom('div', 'hp-list-result')));
 };
 
 
-/**
- * Called after rendering is done.
- * @return {boolean} Whether this method have completed successfully.
- */
-historyplus.ListView.prototype.onEndDrowList = function() {
-  return true;
+/** @override */
+historyplus.ListView.prototype.enterDocument = function() {
+  goog.base(this, 'enterDocument');
 };
-
 

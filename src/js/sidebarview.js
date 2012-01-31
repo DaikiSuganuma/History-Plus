@@ -1,4 +1,4 @@
-// Copyright (c) 2011 History Plus Authors. All rights reserved.
+// Copyright (c) 2012 History Plus Authors. All rights reserved.
 //
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
@@ -55,6 +55,7 @@ historyplus.SidebarView.CLASS_NAME_ = goog.getCssName('hp-sidebar');
  * Initialize components.
  * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @return {boolean} Whether this method have completed successfully.
+ * @private
  */
 historyplus.SidebarView.prototype.initialize_ = function(opt_domHelper) {
 
