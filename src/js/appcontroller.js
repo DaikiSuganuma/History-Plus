@@ -27,45 +27,14 @@
 
 goog.provide('historyplus.AppController');
 
-
 goog.require('goog.events.EventHandler');
+goog.require('goog.dom');
 goog.require('goog.dom.ViewportSizeMonitor');
 goog.require('goog.style');
 
 goog.require('historyplus.HeaderView');
 goog.require('historyplus.SidebarView');
 goog.require('historyplus.ListView');
-
-
-
-
-/**
- * Copy the properties. This method is called by historyplus.inherits.
- *
- * @param {Object} child Child property.
- * @param {Object} parent Parent property.
- */
-historyplus.copyProperties = function(child, parent) {
-  for (var prop in parent) {
-    if (typeof(child[prop]) == 'undefined') {
-      child[prop] = parent[prop];
-    }
-  }
-};
-
-
-/**
- * Inherit the properties and prototype methods from parent constructor
- * into child.
- * This method is called comboboxcontrol.js.
- *
- * @param {Function} child Child class.
- * @param {Function} parent Parent class.
- */
-historyplus.inherits = function(child, parent) {
-  historyplus.copyProperties(child, parent);
-  historyplus.copyProperties(child.prototype, parent.prototype);
-};
 
 
 
@@ -102,18 +71,24 @@ historyplus.AppController.prototype.initialize_ = function() {
   // Create view objects.
   this.headerView_ = new historyplus.HeaderView();
   this.sidebarView_ = new historyplus.SidebarView();
-  return;
-  //this.listView_ = new historyplus.ListView();
+  this.listView_ = new historyplus.ListView();
+
+  // Render the components.
+  this.headerView_.render(goog.dom.getElement('header'));
+  this.sidebarView_.render(goog.dom.getElement('sidebar'));
+  this.listView_.render(goog.dom.getElement('content'));
 
   // Bind event for resizing window.
   this.viewportSizeMonitor_ = new goog.dom.ViewportSizeMonitor();
   this.eventHandler_.listen(this.viewportSizeMonitor_,
                             goog.events.EventType.RESIZE,
                             this.onResizeViewport_);
-  //this.onResizeViewport_();
+  this.onResizeViewport_();
 
   // Excute search method.
   this.searchHistory();
+
+  // Hide "Initializing..." message and show content.
 };
 
 
@@ -122,6 +97,7 @@ historyplus.AppController.prototype.initialize_ = function() {
  * @return {boolean} Whether the search method is working correct.
  */
 historyplus.AppController.prototype.searchHistory = function() {
+  return;
   // Ready for receive search result.
   this.data_ = [];
   this.listView_.onBeginDrowList();
@@ -241,8 +217,6 @@ historyplus.AppController.prototype.saveHistory = function(itemList) {
 
 /**
  * Set width and height of content.
- * @param private
- * @return {boolean} Whether this method have completed successfully.
  * @private
  */
 historyplus.AppController.prototype.onResizeViewport_ = function() {
@@ -250,8 +224,7 @@ historyplus.AppController.prototype.onResizeViewport_ = function() {
 
   // Calculate width of list content.
   var widthContent = 800;
- var domSidebar = this.sidebarView_.getContentElement();
-  console.log(domSidebar);
+  var domSidebar = this.sidebarView_.getContentElement();
   if (domSidebar) {
     var sizeSidebar = goog.style.getSize(domSidebar);
     widthContent = sizeWindow.width - sizeSidebar.width;
@@ -266,12 +239,18 @@ historyplus.AppController.prototype.onResizeViewport_ = function() {
     heightContent = sizeWindow.height - goog.style.getSize(domHeader).height;
     if (heightContent < 400) heightContent = 400;
   }
-  this.listView_.setSize(widthContent, heightContent);
 
-  // Set Sidebar Height.
-  this.sidebarView_.setSize(null, heightContent);
+  // Set width and height of sidebar.
+  var sidebar = goog.dom.getElement('sidebar');
+  var sizeSidebar = goog.style.getSize(sidebar);
+  heightContent = heightContent - 2;
+  goog.style.setSize(sidebar, sizeSidebar.width, heightContent);
 
-  return true;
+  // Set width and height of list.
+  var content = goog.dom.getElement('content');
+  var sizeContent = goog.style.getSize(content);
+  goog.style.setSize(content, widthContent, 'auto');
+  this.listView_.setListHeight(heightContent);
 };
 
 

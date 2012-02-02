@@ -12,6 +12,7 @@
 goog.provide('historyplus.ListView');
 
 
+goog.require('goog.style');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Control');
 goog.require('goog.ui.CustomButton');
@@ -85,12 +86,14 @@ historyplus.ListView.prototype.initialize_ = function(opt_domHelper) {
   // Add control for message area.
   var msg = new goog.ui.Control('Loading ...', null, opt_domHelper);
   msg.addClassName(goog.ui.INLINE_BLOCK_CLASSNAME);
+  msg.addClassName('hp-list-header-message');
   msg.setId('message');
   this.header_.addChild(msg);
 
   // Add control for result text.
-  var res = new goog.ui.Control('20 domain, 26 url', null, opt_domHelper);
+  var res = new goog.ui.Control('0 domain, 0 url', null, opt_domHelper);
   res.addClassName(goog.ui.INLINE_BLOCK_CLASSNAME);
+  res.addClassName('hp-list-header-result-text');
   res.setId('result');
   this.header_.addChild(res);
 
@@ -129,3 +132,20 @@ historyplus.ListView.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 };
 
+
+/**
+ * Set width and height of list content.
+ * This method called when window size is changed.
+ * @param {number} width
+ * @param {number} height
+ */
+historyplus.ListView.prototype.setListHeight = function(height) {
+  var dom = this.getDomHelper();
+  if (goog.isNumber(height)) {
+    var list = dom.getElementByClass('hp-list-result');
+    var sizeHeader = goog.style.getSize(
+      dom.getElementByClass('hp-list-header'));
+    height = height - sizeHeader.height;
+    goog.style.setSize(list, 'auto', height);
+  }
+};
