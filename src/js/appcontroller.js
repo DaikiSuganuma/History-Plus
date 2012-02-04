@@ -88,7 +88,7 @@ historyplus.AppController.prototype.initialize_ = function() {
   // Excute search method.
   this.searchHistory();
 
-  // Hide "Initializing..." message and show content.
+  // TODO:Hide "Initializing..." message and show content.
 };
 
 
@@ -97,13 +97,13 @@ historyplus.AppController.prototype.initialize_ = function() {
  * @return {boolean} Whether the search method is working correct.
  */
 historyplus.AppController.prototype.searchHistory = function() {
-  return;
   // Ready for receive search result.
   this.data_ = [];
-  this.listView_.onBeginDrowList();
 
   // Get search parameter(condition) from header view.
-  var query = this.headerView_.getSearchCondition();
+  var values = this.headerView_.getSelectedValues();
+  console.log(values);
+  return;
   query = query || {};
   query.text = query.text || '';
   query.maxResults = query.maxResults || 100;

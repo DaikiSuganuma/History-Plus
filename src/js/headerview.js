@@ -13,15 +13,18 @@ goog.provide('historyplus.HeaderView');
 
 
 goog.require('goog.array');
+goog.require('goog.date.DateRange');
 goog.require('goog.dom');
 goog.require('goog.dom.query');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
+goog.require('goog.object');
 goog.require('goog.style');
 goog.require('goog.ui.Control');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.Option');
+goog.require('goog.ui.SelectionModel');
 goog.require('goog.ui.Separator');
 goog.require('goog.ui.Toolbar');
 goog.require('goog.ui.ToolbarMenuButton');
@@ -53,6 +56,7 @@ historyplus.HeaderView = function(opt_domHelper) {
 
   // Member Variables.
   this.toolbar_ = null;
+  this.limitButtons_ = null;
 
   // Add child component under Toolbar component.
   this.initialize_(opt_domHelper);
@@ -167,19 +171,24 @@ historyplus.HeaderView.prototype.initialize_ = function(opt_domHelper) {
   this.toolbar_.addChild(limitIcon);
 
   // Insert Limit buttons.
-  var limitValues = [
+  // Have the limit buttons be controlled by selection model. 
+  this.limitButtons_ = new goog.ui.SelectionModel();
+  this.limitButtons_.setSelectionHandler(this.onLimitClick_);
+  var limitButtonsData = [
     ['limit-100', '100'],
     ['limit-250', '250'],
     ['limit-500', '500'],
     ['limit-1000', '1000']];
-  goog.array.forEach(limitValues, function(data, index) {
+  goog.array.forEach(limitButtonsData, function(data, index) {
     var button = new goog.ui.ToolbarToggleButton(data[1], null, opt_domHelper);
     button.addClassName('hp-limit-button');
     button.setValue(data[1]);
     button.setId(data[0]);
+    button.setAutoStates(goog.ui.Component.State.CHECKED, false);
+    this.limitButtons_.addItem(button);
     this.toolbar_.addChild(button);
     if (index == 0) {
-      button.setChecked(true);
+      this.limitButtons_.setSelectedItem(button);
     }
   }, this);
 
@@ -263,8 +272,8 @@ historyplus.HeaderView.prototype.enterDocument = function() {
   // Set style for the text input in Toolbar.
   goog.array.forEach(
     this.getElementsByClass('label-input-label'),
-    function(element) {
-      goog.style.setStyle(element, '-webkit-user-select', 'auto');
+    function(elem) {
+      goog.style.setStyle(elem, '-webkit-user-select', 'auto');
     });
 
   // Set Event Handlers.
@@ -275,12 +284,20 @@ historyplus.HeaderView.prototype.enterDocument = function() {
     this.onAction_);
 
   // Set for Enter event in filter keyword box.
-  var elem = this.toolbar_.getChild('filterkeyword');
   handler.listen(
-    elem,
+    this.toolbar_.getChild('filterkeyword'),
     historyplus.ToolbarLabelInput.EventType.ENTER,
-    this.onFilterKeywordEnter_
-    );
+    this.onFilterKeywordEnter_);
+
+  // Set Event Handlers for limit buttons.
+  goog.array.forEach(
+    this.limitButtons_.getItems(),
+    function(button) {
+      handler.listen(button, goog.ui.Component.EventType.ACTION,
+        function(e) {
+          this.limitButtons_.setSelectedItem(e.target);
+        });
+    }, this);
 };
 
 
@@ -294,12 +311,7 @@ historyplus.HeaderView.prototype.onAction_ = function(e) {
   var id = e.target.getId();
   if (!id) return false;
 
-  if (id == 'limit-100' ||
-      id == 'limit-250' ||
-      id == 'limit-500' ||
-      id == 'limit-1000') {
-    this.onLimitClick_(e);
-  } else if (id == 'data-range') {
+  if (id == 'data-range') {
     this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
   } else if (id == 'filterkeyword-button') {
     this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
@@ -315,22 +327,13 @@ historyplus.HeaderView.prototype.onAction_ = function(e) {
  * @return {boolean} Whether the click event end correctly.
  * @private
  */
-historyplus.HeaderView.prototype.onLimitClick_ = function(e) {
-  var id = e.target.getId();
-  if (!id) return false;
-
-  // Reset limit buttons.
-  goog.array.forEach(
-    this.getElementsByClass('hp-limit-button'),
-    function(element) {
-      var button = this.toolbar_.getChild(element.id);
-      button.setChecked(false);
-    }, this);
-  // Check the click button.
-  e.target.setChecked(true);
-
-  this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
-
+historyplus.HeaderView.prototype.onLimitClick_ = function(button, select) {
+  if (button) {
+    button.setChecked(select);
+    if (select) {
+      this.dispatchEvent(historyplus.HeaderView.EventType.CHANGE_CONDITION);
+    }
+  }
   return true;
 };
 
@@ -348,12 +351,50 @@ historyplus.HeaderView.prototype.onFilterKeywordEnter_ = function(e) {
 
 
 /**
- * Collect search condition from header menu.
+ * Get selected status/information from header menu.
  * @return {object} The object include search condition.
  */
-historyplus.HeaderView.prototype.getSearchCondition = function() {
-  console.log('getSearchCondition');
-  return false;
+historyplus.HeaderView.prototype.getSelectedValues = function() {
+  var data = {};
+  var dom = this.toolbar_.getDomHelper();
+
+  // Get date range.
+  var item = this.toolbar_.getChild('date-range').getSelectedItem();
+  if (item) {
+    var range = null;
+    var value = item.getId();
+    goog.object.add(data, 'dateRangeId', value);
+
+    if (value == 'daterange-today') {
+      range = goog.date.DateRange.today();
+    } else if (value == 'daterange-yesterday') {
+      range = goog.date.DateRange.yesterday();
+    } else if (value == 'daterange-last-week') {
+      range = goog.date.DateRange.lastWeek();
+    } else if (value == 'daterange-last-month') {
+      range = goog.date.DateRange.lastMonth();
+    } else if (value == 'daterange-all') {
+      range = goog.date.DateRange.allTime();
+    }
+    goog.object.add(data, 'dateRange', range);
+    
+    if (range) {
+      // Set start time.
+      goog.object.add(data, 'startTime', range.getStartDate().getTime());
+
+      // Set end time.
+      var endDate = range.getEndDate();
+      endDate.add(new goog.date.Interval(0, 0, 1)); //+1 day
+      goog.object.add(data, 'endTime', endDate.getTime());
+    }
+  }
+
+  // Get max length.
+  var button = this.limitButtons_.getSelectedItem();
+  console.log(button);
+
+  // Get keyword.
+  return data;
 };
 
 

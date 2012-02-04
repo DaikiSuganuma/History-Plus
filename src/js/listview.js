@@ -88,6 +88,7 @@ historyplus.ListView.prototype.initialize_ = function(opt_domHelper) {
   msg.addClassName(goog.ui.INLINE_BLOCK_CLASSNAME);
   msg.addClassName('hp-list-header-message');
   msg.setId('message');
+
   this.header_.addChild(msg);
 
   // Add control for result text.
@@ -124,6 +125,9 @@ historyplus.ListView.prototype.createDom = function() {
     this.header_.getContentElement().appendChild(child.getElement());
   }, this);
 
+  // Hide message area.
+  goog.style.showElement(
+    this.header_.getChild('message').getContentElement(), false);
 };
 
 
